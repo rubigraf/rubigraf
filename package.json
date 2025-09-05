@@ -1,0 +1,38 @@
+{
+  "name": "rubigraf",
+  "version": "1.0.0",
+  "description": "A Powerful and Modern Rubika Bot Framework",
+  "main": "./dist/index.js",
+  "scripts": {
+    "dev": "npx tsc --watch",
+    "build": "npx tsc",
+    "lint": "eslint . --ext .ts",
+    "format": "prettier --write ."
+  },
+  "repository": {
+    "type": "",
+    "url": "git+https://github.com/rubigraf/rubigraf.git"
+  },
+  "keywords": [
+    "rubika",
+    "typescript",
+    "rubigraf",
+    "rubika bot api",
+    "botapi",
+    "bot framework",
+    "framework"
+  ],
+  "author": "rubigraf",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/rubigraf/rubigraf/issues"
+  },
+  "homepage": "https://github.com/rubigraf/rubigraf#readme",
+  "devDependencies": {
+    "@types/node": "^24.3.1",
+    "@typescript-eslint/eslint-plugin": "^8.42.0",
+    "@typescript-eslint/parser": "^8.42.0",
+    "eslint": "^9.35.0",
+    "typescript": "^5.9.2"
+  }
+}
