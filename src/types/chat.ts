@@ -1,41 +1,25 @@
+const chatTypes = ["User", "Bot", "Group", "Channel"] as const;
+
 /**
+ * Represents a chat.
+ *
  * @package rubigraf
  * @since v1.0.0
  */
 interface Chat {
-  /**
-   * User Chat ID.
-   */
+  /** Chat identifier */
   chat_id: string;
-
-  /**
-   * The type of the chat.
-   */
+  /** Type of chat (e.g., User, Bot, Group, Channel) */
   chat_type: ChatTypeEnum;
-
-  /**
-   * User ID.
-   */
+  /** User identifier */
   user_id: string;
-
-  /**
-   * The first name of the user.
-   */
+  /** First name */
   first_name: string;
-
-  /**
-   * The last name of the user.
-   */
+  /** Last name */
   last_name: string;
-
-  /**
-   * title.
-   */
+  /** Title */
   title: string;
-
-  /**
-   * The username of the user.
-   */
+  /** Username */
   username: string;
 }
 
@@ -44,10 +28,12 @@ interface Chat {
  * @since v1.0.0
  */
 enum ChatTypeEnum {
-  User,
-  Bot,
-  Group,
-  Channel,
+  User = "User",
+  Bot = "Bot",
+  Group = "Group",
+  Channel = "Channel",
 }
 
-export type { Chat, ChatTypeEnum };
+type ChatTypes = (typeof chatTypes)[number];
+
+export type { Chat, ChatTypeEnum, ChatTypes };
