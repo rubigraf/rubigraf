@@ -1,4 +1,4 @@
-const chatTypes = ["User", "Bot", "Group", "Channel"] as const;
+export const chatTypes = ["User", "Bot", "Group", "Channel"] as const;
 
 /**
  * Represents a chat.

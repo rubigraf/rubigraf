@@ -1,4 +1,4 @@
-const forwardedFromTypes = ["User", "Channel", "Bot"] as const;
+export const forwardedFromTypes = ["User", "Channel", "Bot"] as const;
 
 /**
  * Represents data about forwarded messages.
