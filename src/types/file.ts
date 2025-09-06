@@ -1,21 +1,15 @@
 /**
+ * Represents a file.
+ *
  * @package rubigraf
  * @since v1.0.0
  */
 interface File {
-  /**
-   * The file ID.
-   */
+  /** File identifier */
   file_id: string;
-
-  /**
-   * The file name
-   */
+  /** Filename */
   file_name: string;
-
-  /**
-   * The size of the file (in Bytes format).
-   */
+  /** File size in bytes (as string) */
   size: string;
 }
 
