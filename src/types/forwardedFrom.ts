@@ -1,26 +1,19 @@
+const forwardedFromTypes = ["User", "Channel", "Bot"] as const;
+
 /**
+ * Represents data about forwarded messages.
+ *
  * @package rubigraf
  * @since v1.0.0
  */
 interface ForwardedFrom {
-  /**
-   * The forward type.
-   */
+  /** The type of source (User, Channel, Bot) */
   type_from: ForwardedFromEnum;
-
-  /**
-   * The message ID.
-   */
+  /** Original message identifier */
   message_id: string;
-
-  /**
-   * The chat ID of a user.
-   */
+  /** Source chat identifier */
   from_chat_id: string;
-
-  /**
-   * The sender ID.
-   */
+  /** Source user identifier */
   from_sender_id: string;
 }
 
@@ -34,4 +27,6 @@ enum ForwardedFromEnum {
   Bot,
 }
 
-export type { ForwardedFrom, ForwardedFromEnum };
+type ForwardedFromType = typeof forwardedFromTypes[number];
+
+export type { ForwardedFrom, ForwardedFromEnum, ForwardedFromType };
