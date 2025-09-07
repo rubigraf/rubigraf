@@ -24,8 +24,8 @@ interface PollStatus {
  * @since v1.0.0
  */
 enum PollStatusEnum {
-  Stopped,
-  Live,
+  Open,
+  Closed,
 }
 
 export type { PollStatus, PollStatusEnum };
