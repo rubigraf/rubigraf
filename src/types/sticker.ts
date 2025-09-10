@@ -13,4 +13,4 @@ interface Sticker {
   emoji_character: string;
 }
 
-export type {};
+export type { Sticker };
