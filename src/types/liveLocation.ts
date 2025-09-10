@@ -1,3 +1,4 @@
+import type { LiveLocationStatusEnum } from "../enums";
 import type { Location } from "./location";
 
 /**
@@ -21,15 +22,4 @@ interface LiveLocation {
   last_update_time: string;
 }
 
-/**
- * Live-tracking location status enum.
- *
- * @package rubigraf
- * @since v1.0.0
- */
-enum LiveLocationStatusEnum {
-  Stopped,
-  Live,
-}
-
-export type { LiveLocation, LiveLocationStatusEnum };
+export type { LiveLocation };

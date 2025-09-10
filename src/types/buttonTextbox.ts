@@ -1,3 +1,6 @@
+import type { ButtonTextboxTypeKeypadEnum } from "../enums";
+import type { ButtonTextboxTypeLineEnum } from "../enums";
+
 /**
  * Textbox input configuration.
  *
@@ -17,26 +20,4 @@ interface ButtonTextbox {
   default_value?: string;
 }
 
-/**
- * Line type.
- *
- * @package rubigraf
- * @since v1.0.0
- */
-enum ButtonTextboxTypeLineEnum {
-  SingleLine,
-  MultiLine,
-}
-
-/**
- * Keypad type.
- *
- * @package rubigraf
- * @since v1.0.0
- */
-enum ButtonTextboxTypeKeypadEnum {
-  String,
-  Number,
-}
-
-export type { ButtonTextbox, ButtonTextboxTypeKeypadEnum, ButtonTextboxTypeLineEnum };
+export type { ButtonTextbox };

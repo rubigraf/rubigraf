@@ -1,0 +1,14 @@
+/**
+ * Display calendar in Solar or Gregorian format.
+ *
+ * @package rubigraf
+ * @since v1.0.0
+ */
+const enum ButtonCalendarTypeEnum {
+  /** Display calendar in Solar format */
+  DatePersian,
+  /** Display calendar in Gregorian format */
+  DateGregorian,
+}
+
+export { ButtonCalendarTypeEnum };

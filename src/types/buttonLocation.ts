@@ -1,3 +1,4 @@
+import type { ButtonLocationTypeEnum } from "../enums";
 import type { Location } from "./location";
 
 /**
@@ -19,15 +20,4 @@ interface ButtonLocation {
   location_image_url?: string;
 }
 
-/**
- * Map/location of button's enum.
- *
- * @package rubigraf
- * @since v1.0.0
- */
-enum ButtonLocationTypeEnum {
-  Picker,
-  View,
-}
-
-export type { ButtonLocation, ButtonLocationTypeEnum };
+export type { ButtonLocation };

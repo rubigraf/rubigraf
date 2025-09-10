@@ -1,4 +1,4 @@
-export const forwardedFromTypes = ["User", "Channel", "Bot"] as const;
+import type { ForwardedFromEnum } from "../enums";
 
 /**
  * Represents data about forwarded messages.
@@ -17,16 +17,4 @@ interface ForwardedFrom {
   from_sender_id: string;
 }
 
-/**
- * @package rubigraf
- * @since v1.0.0
- */
-enum ForwardedFromEnum {
-  User,
-  Channel,
-  Bot,
-}
-
-type ForwardedFromType = typeof forwardedFromTypes[number];
-
-export type { ForwardedFrom, ForwardedFromEnum, ForwardedFromType };
+export type { ForwardedFrom };

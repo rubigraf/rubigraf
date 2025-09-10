@@ -1,3 +1,4 @@
+import type { UpdateTypeEnum } from "../enums";
 import type { Message } from "./message";
 import type { PaymentStatus } from "./paymentStatus";
 
@@ -22,19 +23,4 @@ interface Update {
   updated_payment?: PaymentStatus;
 }
 
-/**
- * Type of updates.
- *
- * @package rubigraf
- * @since v1.0.0
- */
-enum UpdateTypeEnum {
-  UpdatedMessage,
-  NewMessage,
-  RemovedMessage,
-  StartedBot,
-  StoppedBot,
-  UpdatedPayment,
-}
-
-export type { Update, UpdateTypeEnum };
+export type { Update };

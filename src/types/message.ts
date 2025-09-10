@@ -1,3 +1,4 @@
+import type { MessageSenderEnum } from "../enums";
 import type { AuxData } from "./auxData";
 import type { ContactMessage } from "./contactMessage";
 import type { ForwardedFrom } from "./forwardedFrom";
@@ -47,15 +48,4 @@ interface Message {
   live_location?: LiveLocation;
 }
 
-/**
- * Determines owner of the message.
- *
- * @package rubigraf
- * @since v1.0.0
- */
-enum MessageSenderEnum {
-  User,
-  Bot,
-}
-
-export type { Message, MessageSenderEnum };
+export type { Message };

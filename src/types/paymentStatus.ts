@@ -1,3 +1,5 @@
+import type { PaymentStatusEnum } from "../enums";
+
 /**
  * Status of a payment request.
  *
@@ -11,15 +13,4 @@ interface PaymentStatus {
   status: PaymentStatusEnum;
 }
 
-/**
- * Status of a payment request.
- *
- * @package rubigraf
- * @since v1.0.0
- */
-enum PaymentStatusEnum {
-  Paid = "Paid",
-  NotPaid = "NotPaid",
-}
-
-export type { PaymentStatus, PaymentStatusEnum };
+export type { PaymentStatus };

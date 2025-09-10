@@ -1,3 +1,5 @@
+import type { PollStatusEnum } from "../enums";
+
 /**
  * Status / runtime info for a poll.
  *
@@ -17,15 +19,4 @@ interface PollStatus {
   show_total_votes: boolean;
 }
 
-/**
- * Poll status enum.
- *
- * @package rubigraf
- * @since v1.0.0
- */
-enum PollStatusEnum {
-  Open,
-  Closed,
-}
-
-export type { PollStatus, PollStatusEnum };
+export type { PollStatus };

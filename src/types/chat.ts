@@ -1,4 +1,4 @@
-export const chatTypes = ["User", "Bot", "Group", "Channel"] as const;
+import type { ChatTypeEnum } from "../enums";
 
 /**
  * Represents a chat.
@@ -23,17 +23,4 @@ interface Chat {
   username: string;
 }
 
-/**
- * @package rubigraf
- * @since v1.0.0
- */
-enum ChatTypeEnum {
-  User = "User",
-  Bot = "Bot",
-  Group = "Group",
-  Channel = "Channel",
-}
-
-type ChatTypes = (typeof chatTypes)[number];
-
-export type { Chat, ChatTypeEnum, ChatTypes };
+export type { Chat };

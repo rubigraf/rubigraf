@@ -1,3 +1,5 @@
+import type { ButtonCalendarTypeEnum } from "../enums";
+
 /**
  * Calendar input button configuration.
  *
@@ -17,15 +19,4 @@ interface ButtonCalendar {
   title: string;
 }
 
-/**
- * Display calendar in Solar or Gregorian format.
- *
- * @package rubigraf
- * @since v1.0.0
- */
-enum ButtonCalendarTypeEnum {
-  DatePersian,
-  DateGregorian,
-}
-
-export type { ButtonCalendar, ButtonCalendarTypeEnum };
+export type { ButtonCalendar };

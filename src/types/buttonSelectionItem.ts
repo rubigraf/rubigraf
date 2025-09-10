@@ -1,3 +1,5 @@
+import type { ButtonSelectionTypeEnum } from "../enums";
+
 /**
  * Single selectable item inside a selection button.
  *
@@ -13,16 +15,4 @@ interface ButtonSelectionItem {
   type: ButtonSelectionTypeEnum;
 }
 
-/**
- * Button selection type enum.
- *
- * @package rubigraf
- * @since v1.0.0
- */
-enum ButtonSelectionTypeEnum {
-  TextOnly,
-  TextImgThu,
-  TextImgBig,
-}
-
-export type { ButtonSelectionItem, ButtonSelectionTypeEnum };
+export type { ButtonSelectionItem };
