@@ -5,8 +5,8 @@
  * @since v1.0.0
  */
 const enum ButtonLocationTypeEnum {
-  Picker,
-  View,
+  Picker = "Picker",
+  View = "View",
 }
 
 export { ButtonLocationTypeEnum };

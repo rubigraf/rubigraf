@@ -5,11 +5,11 @@
  * @since v1.0.0
  */
 const enum UpdateEndpointTypeEnum {
-  ReceiveUpdate,
-  ReceiveInlineMessage,
-  ReceiveQuery,
-  GetSelectionItem,
-  SearchSelectionItems,
+  ReceiveUpdate = "ReceiveUpdate",
+  ReceiveInlineMessage = "ReceiveInlineMessage",
+  ReceiveQuery = "ReceiveQuery",
+  GetSelectionItem = "GetSelectionItem",
+  SearchSelectionItems = "SearchSelectionItems",
 }
 
 export { UpdateEndpointTypeEnum };

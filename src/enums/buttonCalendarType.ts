@@ -6,9 +6,9 @@
  */
 const enum ButtonCalendarTypeEnum {
   /** Display calendar in Solar format */
-  DatePersian,
+  DatePersian = "DatePersian",
   /** Display calendar in Gregorian format */
-  DateGregorian,
+  DateGregorian = "DateGregorian",
 }
 
 export { ButtonCalendarTypeEnum };

@@ -5,8 +5,8 @@
  * @since v1.0.0
  */
 const enum MessageSenderEnum {
-  User,
-  Bot,
+  User = "User",
+  Bot = "Bot",
 }
 
 export { MessageSenderEnum };

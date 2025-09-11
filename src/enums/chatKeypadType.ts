@@ -6,11 +6,11 @@
  */
 const enum ChatKeypadTypeEnum {
   /** @default */
-  None,
+  None = "None",
   /** Add a new keypad */
-  New,
+  New = "New",
   /** Remove keypad */
-  Remove,
+  Remove = "Remove",
 }
 
 export { ChatKeypadTypeEnum };

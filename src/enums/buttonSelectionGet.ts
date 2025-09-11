@@ -6,9 +6,9 @@
  */
 const enum ButtonSelectionGetEnum {
   /** Display list items using values ​​passed in the items field */
-  Local,
+  Local = "Local",
   /** Searching list items via API */
-  Api,
+  Api = "Api",
 }
 
 export { ButtonSelectionGetEnum };
