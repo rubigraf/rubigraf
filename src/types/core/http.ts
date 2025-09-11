@@ -14,7 +14,7 @@ type HTTPMethod = "GET" | "POST" | "PUT" | "DELETE";
  */
 interface HTTPClientOptions {
   baseURL: string;
-  token?: string;
+  token: string;
   headers?: Record<string, string>;
   timeoutMs?: number;
 }
