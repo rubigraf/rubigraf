@@ -5,12 +5,12 @@
  * @since v1.0.0
  */
 const enum UpdateTypeEnum {
-  UpdatedMessage,
-  NewMessage,
-  RemovedMessage,
-  StartedBot,
-  StoppedBot,
-  UpdatedPayment,
+  UpdatedMessage = "UpdatedMessage",
+  NewMessage = "NewMessage",
+  RemovedMessage = "RemovedMessage",
+  StartedBot = "StartedBot",
+  StoppedBot = "StoppedBot",
+  UpdatedPayment = "UpdatedPayment",
 }
 
 export { UpdateTypeEnum };

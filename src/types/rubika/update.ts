@@ -8,19 +8,35 @@ import type { PaymentStatus } from "./paymentStatus";
  * @package rubigraf
  * @since v1.0.0
  */
-interface Update {
-  /** Update type */
-  type: UpdateTypeEnum;
+interface BaseUpdate {
   /** Chat id related to update */
   chat_id: string;
-  /** Optional removed message id (if a message was deleted) */
-  removed_message_id?: string;
-  /** New incoming message */
-  new_message?: Message;
-  /** Edited message */
-  updated_message?: Message;
-  /** Updated payment information */
-  updated_payment?: PaymentStatus;
 }
 
-export type { Update };
+type Update =
+  | (BaseUpdate & {
+      type: UpdateTypeEnum.NewMessage;
+      new_message: Message;
+    })
+  | (BaseUpdate & {
+      type: UpdateTypeEnum.RemovedMessage;
+      removed_message_id: string;
+    })
+  | (BaseUpdate & {
+      type: UpdateTypeEnum.StartedBot;
+      new_message: Message;
+    })
+  | (BaseUpdate & {
+      type: UpdateTypeEnum.StoppedBot;
+      new_message: Message;
+    })
+  | (BaseUpdate & {
+      type: UpdateTypeEnum.UpdatedMessage;
+      updated_message: Message;
+    })
+  | (BaseUpdate & {
+      type: UpdateTypeEnum.UpdatedPayment;
+      updated_payment: PaymentStatus;
+    });
+
+export type { BaseUpdate, Update };
