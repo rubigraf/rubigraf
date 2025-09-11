@@ -3,6 +3,8 @@
   "version": "1.0.0",
   "description": "A Powerful and Modern Rubika Bot Framework",
   "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "module": "./dist/index.js",
   "scripts": {
     "dev": "npx tsc --watch",
     "build": "npx tsc",
