@@ -13,6 +13,12 @@ interface BaseUpdate {
   chat_id: string;
 }
 
+/**
+ * Update union type.
+ *
+ * @package rubigraf
+ * @since v1.0.0
+ */
 type Update =
   | (BaseUpdate & {
       type: UpdateTypeEnum.NewMessage;
@@ -51,4 +57,23 @@ type UpdateMap = {
   [K in Update as K["type"]]: Extract<Update, { type: K["type"] }>;
 };
 
-export type { BaseUpdate, Update, UpdateMap };
+// Helper types
+
+type NewMessageUpdate = UpdateMap[UpdateTypeEnum.NewMessage];
+type RemovedMessageUpdate = UpdateMap[UpdateTypeEnum.RemovedMessage];
+type StartedBotUpdate = UpdateMap[UpdateTypeEnum.StartedBot];
+type StoppedBotUpdate = UpdateMap[UpdateTypeEnum.StoppedBot];
+type UpdatedMessageUpdate = UpdateMap[UpdateTypeEnum.UpdatedMessage];
+type UpdatedPaymentUpdate = UpdateMap[UpdateTypeEnum.UpdatedPayment];
+
+export type {
+  BaseUpdate,
+  NewMessageUpdate,
+  RemovedMessageUpdate,
+  StartedBotUpdate,
+  StoppedBotUpdate,
+  Update,
+  UpdateMap,
+  UpdatedMessageUpdate,
+  UpdatedPaymentUpdate,
+};
