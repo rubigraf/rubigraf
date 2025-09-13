@@ -178,7 +178,6 @@ class Rubigraf extends Event {
               u.type === UpdateTypeEnum.NewMessage ? u.new_message.time : u.updated_message.time;
 
             const maxAge = Math.floor(this.opts.pollIntervalMs! / 1000);
-            console.log(`Now: ${now} Time: ${time} Substract: ${now - time} Max Age: ${maxAge}`);
             if (now - time > maxAge) continue;
           }
 
@@ -186,6 +185,8 @@ class Rubigraf extends Event {
         }
 
         this.offset_id = updates.next_offset_id || this.offset_id;
+
+        if (updates.next_offset_id) continue;
       } catch (err) {
         this.emit(RubigrafEvents.Error, err);
       }
