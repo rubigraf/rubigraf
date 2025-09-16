@@ -1,4 +1,5 @@
 import { CommandUpdate } from "../../../types";
+import Rubigraf from "../../rubigraf";
 import { BaseMessageContext } from "./base";
 
 /**
@@ -8,7 +9,18 @@ import { BaseMessageContext } from "./base";
  * @since v1.0.0
  */
 class CommandContext extends BaseMessageContext<CommandUpdate> {
-  private static subCommands: string[] = [];
+  private subCommands: string[] = [];
+  private cmd: string | null = null;
+
+  constructor(update: CommandUpdate, bot: Rubigraf) {
+    super(update, bot);
+
+    const splited = this.message.text?.split(" ");
+    if (splited && splited.length > 0) {
+      if (splited.length > 1) this.subCommands = splited.slice(1);
+      this.cmd = splited[0].slice(1) ?? null;
+    }
+  }
 
   /**
    * Get the command from the message.
@@ -23,11 +35,7 @@ class CommandContext extends BaseMessageContext<CommandUpdate> {
    * @since v1.0.0
    */
   public get command() {
-    const splited = this.message.text?.split(" ");
-    if (!splited || splited.length === 0) return null;
-    if (splited.length > 1) CommandContext.subCommands = splited.slice(1);
-
-    return splited[0].slice(1) ?? null;
+    return this.cmd;
   }
 
   /**
@@ -52,7 +60,7 @@ class CommandContext extends BaseMessageContext<CommandUpdate> {
    * @since v1.0.0
    */
   public get subCommand() {
-    return CommandContext.length > 0 ? CommandContext.subCommands : null;
+    return this.subCommands.length > 0 ? this.subCommands : null;
   }
 }
 
