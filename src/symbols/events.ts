@@ -12,6 +12,7 @@ import {
 } from "../types";
 
 namespace RubigrafEvents {
+  export const Command = Symbol("command");
   export const Error = Symbol("error");
   export const NewMessage = Symbol("new_message");
   export const RemovedMessage = Symbol("removed_message");
@@ -22,6 +23,7 @@ namespace RubigrafEvents {
   export const Update = Symbol("update");
 
   export type Map = {
+    [Command]: [ctx: Context<NewMessageUpdate>];
     [Error]: [err: Error | string | unknown, code?: number];
     [NewMessage]: [ctx: Context<NewMessageUpdate>, msg: Message];
     [RemovedMessage]: [ctx: Context<RemovedMessageUpdate>, id: string];

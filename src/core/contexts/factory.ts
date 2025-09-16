@@ -1,8 +1,9 @@
 import { UpdateTypeEnum } from "../../enums";
+import { isCommand } from "../../helper";
 import { Context, Update } from "../../types";
 import Rubigraf from "../rubigraf";
 import { BaseContext } from "./base";
-import { NewMessageContext, UpdatedMessageContext } from "./message";
+import { CommandContext, NewMessageContext, UpdatedMessageContext } from "./message";
 import { RemovedMessageContext } from "./removeMessage";
 import { StartedBotContext } from "./startedBot";
 import { StoppedBotContext } from "./stoppedBot";
@@ -17,6 +18,10 @@ import { UpdatedPaymentContext } from "./updatedPayment";
 function createContext<U extends Update>(update: U, bot: Rubigraf): Context<U> {
   switch (update.type) {
     case UpdateTypeEnum.NewMessage:
+      if (isCommand(update.new_message.text || "")) {
+        return new CommandContext(update, bot) as Context<U>;
+      }
+
       return new NewMessageContext(update, bot) as Context<U>;
 
     case UpdateTypeEnum.UpdatedMessage:

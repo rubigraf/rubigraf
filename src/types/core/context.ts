@@ -1,5 +1,6 @@
 import {
   BaseContext,
+  CommandContext,
   NewMessageContext,
   RemovedMessageContext,
   StartedBotContext,
@@ -8,6 +9,7 @@ import {
   UpdatedPaymentContext,
 } from "../../core/contexts";
 import type {
+  CommandUpdate,
   NewMessageUpdate,
   RemovedMessageUpdate,
   StartedBotUpdate,
@@ -17,7 +19,9 @@ import type {
   UpdatedPaymentUpdate,
 } from "../rubika";
 
-type Context<T extends Update = Update> = T extends NewMessageUpdate
+type Context<T extends Update = Update> = T extends CommandUpdate
+  ? CommandContext
+  : T extends NewMessageUpdate
   ? NewMessageContext
   : T extends RemovedMessageUpdate
   ? RemovedMessageContext

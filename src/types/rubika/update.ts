@@ -59,6 +59,7 @@ type UpdateMap = {
 
 // Helper types
 
+type CommandUpdate = UpdateMap[UpdateTypeEnum.NewMessage];
 type NewMessageUpdate = UpdateMap[UpdateTypeEnum.NewMessage];
 type RemovedMessageUpdate = UpdateMap[UpdateTypeEnum.RemovedMessage];
 type StartedBotUpdate = UpdateMap[UpdateTypeEnum.StartedBot];
@@ -68,6 +69,7 @@ type UpdatedPaymentUpdate = UpdateMap[UpdateTypeEnum.UpdatedPayment];
 
 export type {
   BaseUpdate,
+  CommandUpdate,
   NewMessageUpdate,
   RemovedMessageUpdate,
   StartedBotUpdate,

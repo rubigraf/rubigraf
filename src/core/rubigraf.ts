@@ -13,12 +13,14 @@ import type {
   UpdatedPaymentUpdate,
   GetUpdatesResponse,
   Middleware,
+  CommandUpdate,
 } from "../types";
 import { compose } from "./middleware";
 import { RubigrafEvents } from "../symbols";
 import { UpdateTypeEnum } from "../enums";
 import { Context } from "../types";
 import { createContext } from "./contexts";
+import { isCommand } from "../helper";
 
 const DEFAULT_OPTS: Required<RubigrafOptions> = {
   baseURL: "https://botapi.rubika.ir/v3/",
@@ -114,6 +116,11 @@ class Rubigraf extends Event {
 
     switch (update.type) {
       case UpdateTypeEnum.NewMessage:
+        const m = update.new_message;
+        if (isCommand(m.text || "")) {
+          this.emit(RubigrafEvents.Command, ctx as Context<CommandUpdate>);
+        }
+
         this.emit(RubigrafEvents.NewMessage, ctx as Context<NewMessageUpdate>, update.new_message);
         break;
 
