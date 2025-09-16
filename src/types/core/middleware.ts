@@ -1,6 +1,8 @@
+import { next } from "../../helper";
 import { Context } from "./context";
 
-type Next = () => Promise<void>;
-type Middleware = (ctx: Context, next: Next) => Promise<void> | void;
+type Next = typeof next;
+type MiddlewareNext = () => Promise<void>;
+type Middleware = (ctx: Context, next: MiddlewareNext) => Promise<void> | void;
 
-export { Middleware, Next };
+export { Middleware, MiddlewareNext, Next };

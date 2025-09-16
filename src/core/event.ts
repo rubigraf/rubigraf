@@ -1,5 +1,7 @@
 import { EventEmitter } from "node:events";
-import { RubigrafEvents } from "../symbols";
+import { NEXT, RubigrafEvents } from "../symbols";
+import { next } from "../helper";
+import { DropLast } from "../types/utility";
 
 /**
  * Generic typed Event class built on top of Node.js {@link EventEmitter}.
@@ -61,16 +63,38 @@ class Event extends EventEmitter {
     event: K,
     ...args: RubigrafEvents.Map[K]
   ): boolean {
-    // fire "before" hooks
-    this.before.get(event)?.forEach(fn => fn(...args));
+    // Before hooks
+    if (!this.callListeners(this.before.get(event), args)) return false;
 
-    const result = super.emit(event, ...args);
+    // Main listeners
+    if (!this.callListeners(new Set(this.listeners(event)), args)) return false;
 
-    // fire "after" hooks
-    this.after.get(event)?.forEach(fn => fn(...args));
+    // After hooks
+    this.after.get(event)?.forEach(fn => fn(...(args.slice(0) as DropLast<RubigrafEvents.Map[K]>)));
 
-    return result;
+    return true;
   }
+
+  /**
+   * Helper to call listeners with next.
+   *
+   * @param listeners The set of listeners
+   * @param args The event arguments
+   * @returns `false` if any listener aborted the chain, `true` otherwise
+   */
+  private callListeners(
+      listeners: Set<Function> | undefined,
+      args: any[]
+    ): boolean {
+      if (!listeners) return true;
+
+      for (const fn of listeners) {
+        const result: void | typeof NEXT = fn(...args);
+        if (result !== NEXT) return false;
+      }
+
+      return true;
+    }
 
   /**
    * Install a handler lazily.
@@ -135,7 +159,7 @@ class Event extends EventEmitter {
    */
   public onAfter<K extends keyof RubigrafEvents.Map>(
     event: K,
-    listener: (...args: RubigrafEvents.Map[K]) => void
+    listener: (...args: DropLast<RubigrafEvents.Map[K]>) => void
   ): this {
     if (!this.after.has(event)) {
       this.after.set(event, new Set());
@@ -148,11 +172,7 @@ class Event extends EventEmitter {
    * Check if there are no listeners (including before/after).
    */
   public isEmpty(): boolean {
-    return (
-      this.eventNames().length === 0 &&
-      this.before.size === 0 &&
-      this.after.size === 0
-    );
+    return this.eventNames().length === 0 && this.before.size === 0 && this.after.size === 0;
   }
 }
 

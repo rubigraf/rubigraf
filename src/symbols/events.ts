@@ -2,6 +2,7 @@ import {
   Context,
   Message,
   NewMessageUpdate,
+  Next,
   PaymentStatus,
   RemovedMessageUpdate,
   StartedBotUpdate,
@@ -23,15 +24,15 @@ namespace RubigrafEvents {
   export const Update = Symbol("update");
 
   export type Map = {
-    [Command]: [ctx: Context<NewMessageUpdate>];
-    [Error]: [err: Error | string | unknown, code?: number];
-    [NewMessage]: [ctx: Context<NewMessageUpdate>, msg: Message];
-    [RemovedMessage]: [ctx: Context<RemovedMessageUpdate>, id: string];
-    [StartedBot]: [ctx: Context<StartedBotUpdate>, update: Update];
-    [StoppedBot]: [ctx: Context<StoppedBotUpdate>, update: Update];
-    [UpdatedPayment]: [ctx: Context<UpdatedPaymentUpdate>, payment: PaymentStatus];
-    [UpdatedMessage]: [ctx: Context<UpdatedMessageUpdate>, msg: Message];
-    [Update]: [ctx: Context, update: Update];
+    [Command]: [ctx: Context<NewMessageUpdate>, next: Next];
+    [Error]: [err: Error | string | unknown, next: Next];
+    [NewMessage]: [ctx: Context<NewMessageUpdate>, msg: Message, next: Next];
+    [RemovedMessage]: [ctx: Context<RemovedMessageUpdate>, id: string, next: Next];
+    [StartedBot]: [ctx: Context<StartedBotUpdate>, update: Update, next: Next];
+    [StoppedBot]: [ctx: Context<StoppedBotUpdate>, update: Update, next: Next];
+    [UpdatedPayment]: [ctx: Context<UpdatedPaymentUpdate>, payment: PaymentStatus, next: Next];
+    [UpdatedMessage]: [ctx: Context<UpdatedMessageUpdate>, msg: Message, next: Next];
+    [Update]: [ctx: Context, update: Update, next: Next];
   };
 
   /**

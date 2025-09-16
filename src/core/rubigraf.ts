@@ -20,7 +20,7 @@ import { RubigrafEvents } from "../symbols";
 import { UpdateTypeEnum } from "../enums";
 import { Context } from "../types";
 import { createContext } from "./contexts";
-import { isCommand } from "../helper";
+import { isCommand, next } from "../helper";
 
 const DEFAULT_OPTS: Required<RubigrafOptions> = {
   baseURL: "https://botapi.rubika.ir/v3/",
@@ -39,6 +39,7 @@ class Rubigraf extends Event {
   private http: HTTPClient;
   private middlewares: Middleware[] = [];
   private running = false;
+  private onLastUpdate = false;
   private offset_id?: string;
   private composed = compose([]);
 
@@ -76,7 +77,7 @@ class Rubigraf extends Event {
     offset_id?: string,
     limit?: number
   ): Promise<APIResponse<GetUpdatesResponse>["data"]> {
-    const res = await this.http.request<APIResponse<GetUpdatesResponse>>("POST", `getUpdates`, {
+    const res = await this.http.request<APIResponse<GetUpdatesResponse>>("POST", "getUpdates", {
       offset_id,
       limit,
     });
@@ -94,7 +95,7 @@ class Rubigraf extends Event {
    * @param text Message content
    */
   async sendMessage(chatId: string, text: string): Promise<Message> {
-    const res = await this.http.request<APIResponse<Message>>("POST", `sendMessage`, {
+    const res = await this.http.request<APIResponse<Message>>("POST", "sendMessage", {
       chat_id: chatId,
       text,
     });
@@ -118,33 +119,40 @@ class Rubigraf extends Event {
       case UpdateTypeEnum.NewMessage:
         const m = update.new_message;
         if (isCommand(m.text || "")) {
-          this.emit(RubigrafEvents.Command, ctx as Context<CommandUpdate>);
+          this.emit(RubigrafEvents.Command, ctx as Context<CommandUpdate>, next);
         }
 
-        this.emit(RubigrafEvents.NewMessage, ctx as Context<NewMessageUpdate>, update.new_message);
+        this.emit(
+          RubigrafEvents.NewMessage,
+          ctx as Context<NewMessageUpdate>,
+          update.new_message,
+          next
+        );
         break;
 
       case UpdateTypeEnum.RemovedMessage:
         this.emit(
           RubigrafEvents.RemovedMessage,
           ctx as Context<RemovedMessageUpdate>,
-          update.removed_message_id
+          update.removed_message_id,
+          next
         );
         break;
 
       case UpdateTypeEnum.StartedBot:
-        this.emit(RubigrafEvents.StartedBot, ctx as Context<StartedBotUpdate>, update);
+        this.emit(RubigrafEvents.StartedBot, ctx as Context<StartedBotUpdate>, update, next);
         break;
 
       case UpdateTypeEnum.StoppedBot:
-        this.emit(RubigrafEvents.StoppedBot, ctx as Context<StoppedBotUpdate>, update);
+        this.emit(RubigrafEvents.StoppedBot, ctx as Context<StoppedBotUpdate>, update, next);
         break;
 
       case UpdateTypeEnum.UpdatedMessage:
         this.emit(
           RubigrafEvents.UpdatedMessage,
           ctx as Context<UpdatedMessageUpdate>,
-          update.updated_message
+          update.updated_message,
+          next
         );
         break;
 
@@ -152,7 +160,8 @@ class Rubigraf extends Event {
         this.emit(
           RubigrafEvents.UpdatedPayment,
           ctx as Context<UpdatedPaymentUpdate>,
-          update.updated_payment
+          update.updated_payment,
+          next
         );
         break;
 
@@ -160,7 +169,7 @@ class Rubigraf extends Event {
         break;
     }
 
-    this.emit(RubigrafEvents.Update, ctx, update);
+    this.emit(RubigrafEvents.Update, ctx, update, next);
   }
 
   /**
@@ -194,8 +203,12 @@ class Rubigraf extends Event {
         this.offset_id = updates.next_offset_id || this.offset_id;
 
         if (updates.next_offset_id) continue;
+        if (!this.onLastUpdate) {
+          console.log("Rubigraf is up & running...");
+          this.onLastUpdate = true;
+        }
       } catch (err) {
-        this.emit(RubigrafEvents.Error, err);
+        this.emit(RubigrafEvents.Error, err, next);
       }
 
       await new Promise((r) => setTimeout(r, interval));
