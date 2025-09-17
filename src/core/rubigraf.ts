@@ -125,7 +125,6 @@ class Rubigraf extends Event {
         this.emit(
           RubigrafEvents.NewMessage,
           ctx as Context<NewMessageUpdate>,
-          update.new_message,
           next
         );
         break;
@@ -134,24 +133,22 @@ class Rubigraf extends Event {
         this.emit(
           RubigrafEvents.RemovedMessage,
           ctx as Context<RemovedMessageUpdate>,
-          update.removed_message_id,
           next
         );
         break;
 
       case UpdateTypeEnum.StartedBot:
-        this.emit(RubigrafEvents.StartedBot, ctx as Context<StartedBotUpdate>, update, next);
+        this.emit(RubigrafEvents.StartedBot, ctx as Context<StartedBotUpdate>, next);
         break;
 
       case UpdateTypeEnum.StoppedBot:
-        this.emit(RubigrafEvents.StoppedBot, ctx as Context<StoppedBotUpdate>, update, next);
+        this.emit(RubigrafEvents.StoppedBot, ctx as Context<StoppedBotUpdate>, next);
         break;
 
       case UpdateTypeEnum.UpdatedMessage:
         this.emit(
           RubigrafEvents.UpdatedMessage,
           ctx as Context<UpdatedMessageUpdate>,
-          update.updated_message,
           next
         );
         break;
@@ -160,7 +157,6 @@ class Rubigraf extends Event {
         this.emit(
           RubigrafEvents.UpdatedPayment,
           ctx as Context<UpdatedPaymentUpdate>,
-          update.updated_payment,
           next
         );
         break;
@@ -169,7 +165,7 @@ class Rubigraf extends Event {
         break;
     }
 
-    this.emit(RubigrafEvents.Update, ctx, update, next);
+    this.emit(RubigrafEvents.Update, ctx, next);
   }
 
   /**
