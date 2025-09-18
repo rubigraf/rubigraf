@@ -54,7 +54,7 @@ class Event extends EventEmitter {
   }
 
   /**
-   * Emit an event (fires before → main → after listeners).
+   * Emit an event synchronously (fires before → main → after listeners).
    *
    * @param event The event name
    * @param args The event arguments
@@ -63,38 +63,67 @@ class Event extends EventEmitter {
     event: K,
     ...args: RubigrafEvents.Map[K]
   ): boolean {
-    // Before hooks
-    if (!this.callListeners(this.before.get(event), args)) return false;
+    const callSync = (listeners?: Set<Function>): boolean => {
+      if (!listeners) return true;
+      for (const fn of listeners) {
+        const result = fn(...args);
+        if (result !== NEXT) return false;
+      }
+      return true;
+    };
 
-    // Main listeners
-    if (!this.callListeners(new Set(this.listeners(event)), args)) return false;
+    if (!callSync(this.before.get(event))) return false;
+    if (!callSync(new Set(this.listeners(event)))) return false;
 
-    // After hooks
-    this.after.get(event)?.forEach(fn => fn(...(args.slice(0) as DropLast<RubigrafEvents.Map[K]>)));
+    this.after
+      .get(event)
+      ?.forEach((fn) => fn(...(args.slice(0) as DropLast<RubigrafEvents.Map[K]>)));
 
     return true;
   }
 
   /**
-   * Helper to call listeners with next.
+   * Emit an event asynchronously (fires before → main → after listeners).
+   *
+   * @param event The event name
+   * @param args The event arguments
+   */
+  public async emitAsync<K extends keyof RubigrafEvents.Map>(
+    event: K,
+    ...args: RubigrafEvents.Map[K]
+  ): Promise<boolean> {
+    if (!(await this.callListeners(this.before.get(event), args))) return false;
+    if (!(await this.callListeners(new Set(this.listeners(event)), args))) return false;
+
+    for (const fn of this.after.get(event) ?? []) {
+      const result: any = fn(...(args.slice(0) as DropLast<RubigrafEvents.Map[K]>));
+      if (result instanceof Promise) await result;
+    }
+
+    return true;
+  }
+
+  /**
+   * Helper to call listeners with next().
+   * Supports both sync and async.
    *
    * @param listeners The set of listeners
    * @param args The event arguments
-   * @returns `false` if any listener aborted the chain, `true` otherwise
+   * @returns `false` if chain aborted, `true` otherwise
    */
-  private callListeners(
-      listeners: Set<Function> | undefined,
-      args: any[]
-    ): boolean {
-      if (!listeners) return true;
+  private async callListeners(listeners: Set<Function> | undefined, args: any[]): Promise<boolean> {
+    if (!listeners) return true;
 
-      for (const fn of listeners) {
-        const result: void | typeof NEXT = fn(...args);
-        if (result !== NEXT) return false;
-      }
+    for (const fn of listeners) {
+      const result = fn(...args);
 
-      return true;
+      const awaited = result instanceof Promise ? await result : result;
+
+      if (awaited !== NEXT) return false;
     }
+
+    return true;
+  }
 
   /**
    * Install a handler lazily.
