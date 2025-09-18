@@ -38,10 +38,15 @@ class BaseContext<T extends Update = Update> {
    * Send a reply to the current chat.
    *
    * @param text Text message to send
+   * @param replyTo The message ID to reply to
+   * @param disableNotification Whether notification should be disabled or not
    * @since v1.0.0
    */
-  reply(text: string) {
-    return this.bot.sendMessage(this.chatId, text);
+  reply(text: string, replyTo?: string, disableNotification?: boolean) {
+    return this.bot.sendMessage(this.chatId, text, {
+      replyToMessageId: replyTo,
+      disableNotification,
+    });
   }
 
   public async getMe() {

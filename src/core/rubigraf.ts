@@ -15,6 +15,7 @@ import type {
   Middleware,
   CommandUpdate,
   Bot,
+  SendMessageOptions,
 } from "../types";
 import { compose } from "./middleware";
 import { RubigrafEvents } from "../symbols";
@@ -40,7 +41,7 @@ class Rubigraf extends Event {
   private http: HTTPClient;
   private middlewares: Middleware[] = [];
   private running = false;
-  private onLastUpdate = false;
+  private isOnLatestUpdate = false;
   private offset_id?: string;
   private composed = compose([]);
 
@@ -107,12 +108,33 @@ class Rubigraf extends Event {
    *
    * @param chatId Target chat ID
    * @param text Message content
+   * @param opts Send message options
    */
-  async sendMessage(chatId: string, text: string): Promise<Message> {
-    const res = await this.http.request<APIResponse<Message>>("POST", "sendMessage", {
-      chat_id: chatId,
-      text,
-    });
+  async sendMessage(chatId: string, text: string, opts?: SendMessageOptions): Promise<Message> {
+    let res: APIResponse<Message>;
+
+    const req = async (body: object) => {
+      return await this.http.request<APIResponse<Message>>("POST", "sendMessage", body);
+    };
+
+    if (opts) {
+      const payload: Record<string, any> = {
+        chat_id: chatId,
+        text,
+      };
+      if (opts.chatKeypad) payload.chat_keypad = opts.chatKeypad;
+      if (opts.chatKeypadType) payload.chat_keypad_type = opts.chatKeypadType;
+      if (opts.disableNotification) payload.disable_notification = opts.disableNotification;
+      if (opts.inlineKeypad) payload.inline_keypad = opts.inlineKeypad;
+      if (opts.replyToMessageId) payload.reply_to_message_id = opts.replyToMessageId;
+
+      res = await req(payload);
+    } else {
+      res = await req({
+        chat_id: chatId,
+        text,
+      });
+    }
 
     if (res.status !== "OK") {
       throw new Error(`sendMessage failed due to "${res.status}" status.`);
@@ -210,9 +232,9 @@ class Rubigraf extends Event {
         this.offset_id = updates.next_offset_id || this.offset_id;
 
         if (updates.next_offset_id) continue;
-        if (!this.onLastUpdate) {
+        if (!this.isOnLatestUpdate) {
           console.log("Rubigraf is up & running...");
-          this.onLastUpdate = true;
+          this.isOnLatestUpdate = true;
         }
       } catch (err) {
         await this.emitAsync(RubigrafEvents.Error, err, next);
