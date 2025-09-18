@@ -14,6 +14,7 @@ import type {
   GetUpdatesResponse,
   Middleware,
   CommandUpdate,
+  Bot,
 } from "../types";
 import { compose } from "./middleware";
 import { RubigrafEvents } from "../symbols";
@@ -24,7 +25,7 @@ import { isCommand, next } from "../helper";
 
 const DEFAULT_OPTS: Required<RubigrafOptions> = {
   baseURL: "https://botapi.rubika.ir/v3/",
-  pollIntervalMs: 1500,
+  pollIntervalMs: 2000,
 };
 
 /**
@@ -89,6 +90,19 @@ class Rubigraf extends Event {
   }
 
   /**
+   * Gets bot's info.
+   */
+  async getMe(): Promise<Bot> {
+    const res = await this.http.request<APIResponse<Record<"bot", Bot>>>("POST", "getMe");
+
+    if (res.status !== "OK") {
+      throw new Error(`getMe failed due to "${res.status}" status.`);
+    }
+
+    return res.data.bot;
+  }
+
+  /**
    * Send a message to a chat.
    *
    * @param chatId Target chat ID
@@ -103,6 +117,7 @@ class Rubigraf extends Event {
     if (res.status !== "OK") {
       throw new Error(`sendMessage failed due to "${res.status}" status.`);
     }
+
     return res.data;
   }
 
@@ -119,18 +134,14 @@ class Rubigraf extends Event {
       case UpdateTypeEnum.NewMessage:
         const m = update.new_message;
         if (isCommand(m.text || "")) {
-          this.emit(RubigrafEvents.Command, ctx as Context<CommandUpdate>, next);
+          await this.emitAsync(RubigrafEvents.Command, ctx as Context<CommandUpdate>, next);
         }
 
-        this.emit(
-          RubigrafEvents.NewMessage,
-          ctx as Context<NewMessageUpdate>,
-          next
-        );
+        await this.emitAsync(RubigrafEvents.NewMessage, ctx as Context<NewMessageUpdate>, next);
         break;
 
       case UpdateTypeEnum.RemovedMessage:
-        this.emit(
+        await this.emitAsync(
           RubigrafEvents.RemovedMessage,
           ctx as Context<RemovedMessageUpdate>,
           next
@@ -138,15 +149,15 @@ class Rubigraf extends Event {
         break;
 
       case UpdateTypeEnum.StartedBot:
-        this.emit(RubigrafEvents.StartedBot, ctx as Context<StartedBotUpdate>, next);
+        await this.emitAsync(RubigrafEvents.StartedBot, ctx as Context<StartedBotUpdate>, next);
         break;
 
       case UpdateTypeEnum.StoppedBot:
-        this.emit(RubigrafEvents.StoppedBot, ctx as Context<StoppedBotUpdate>, next);
+        await this.emitAsync(RubigrafEvents.StoppedBot, ctx as Context<StoppedBotUpdate>, next);
         break;
 
       case UpdateTypeEnum.UpdatedMessage:
-        this.emit(
+        await this.emitAsync(
           RubigrafEvents.UpdatedMessage,
           ctx as Context<UpdatedMessageUpdate>,
           next
@@ -154,7 +165,7 @@ class Rubigraf extends Event {
         break;
 
       case UpdateTypeEnum.UpdatedPayment:
-        this.emit(
+        await this.emitAsync(
           RubigrafEvents.UpdatedPayment,
           ctx as Context<UpdatedPaymentUpdate>,
           next
@@ -165,7 +176,7 @@ class Rubigraf extends Event {
         break;
     }
 
-    this.emit(RubigrafEvents.Update, ctx, next);
+    await this.emitAsync(RubigrafEvents.Update, ctx, next);
   }
 
   /**
@@ -204,7 +215,7 @@ class Rubigraf extends Event {
           this.onLastUpdate = true;
         }
       } catch (err) {
-        this.emit(RubigrafEvents.Error, err, next);
+        await this.emitAsync(RubigrafEvents.Error, err, next);
       }
 
       await new Promise((r) => setTimeout(r, interval));

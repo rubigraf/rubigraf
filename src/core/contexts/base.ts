@@ -43,6 +43,10 @@ class BaseContext<T extends Update = Update> {
   reply(text: string) {
     return this.bot.sendMessage(this.chatId, text);
   }
+
+  public async getMe() {
+    return await this.bot.getMe();
+  }
 }
 
 export { BaseContext };
