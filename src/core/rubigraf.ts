@@ -50,6 +50,8 @@ class Rubigraf extends Event {
    *
    * @param token Bot token
    * @param opts Optional configuration (baseURL, pollIntervalMs)
+   *
+   * @since v1.0.0
    */
   constructor(private token: string, private opts: RubigrafOptions = {}) {
     super();
@@ -62,6 +64,8 @@ class Rubigraf extends Event {
    * Register a middleware.
    *
    * @param mw Middleware function
+   *
+   * @since v1.0.0
    */
   use(mw: Middleware) {
     this.middlewares.push(mw);
@@ -74,6 +78,8 @@ class Rubigraf extends Event {
    *
    * @param offset_id Update offset_id for pagination
    * @param limit Max number of updates to fetch
+   *
+   * @since v1.0.0
    */
   private async getUpdates(
     offset_id?: string,
@@ -92,6 +98,8 @@ class Rubigraf extends Event {
 
   /**
    * Gets bot's info.
+   *
+   * @since v1.0.0
    */
   async getMe(): Promise<Bot> {
     const res = await this.http.request<APIResponse<Record<"bot", Bot>>>("POST", "getMe");
@@ -109,6 +117,8 @@ class Rubigraf extends Event {
    * @param chatId Target chat ID
    * @param text Message content
    * @param opts Send message options
+   *
+   * @since v1.0.0
    */
   async sendMessage(chatId: string, text: string, opts?: SendMessageOptions): Promise<Message> {
     let res: APIResponse<Message>;
@@ -147,6 +157,8 @@ class Rubigraf extends Event {
    * Handle a single update.
    *
    * @param update Update payload from API
+   *
+   * @since v1.0.0
    */
   async handleUpdate<U extends Update>(update: U) {
     const ctx = createContext(update, this);
@@ -206,6 +218,8 @@ class Rubigraf extends Event {
    *
    * Applies time-based filtering: only updates created within
    * `pollIntervalMs` are processed.
+   *
+   * @since v1.0.0
    */
   async launch() {
     if (this.running) return;
@@ -246,6 +260,8 @@ class Rubigraf extends Event {
 
   /**
    * Stop the long-polling loop.
+   *
+   * @since v1.0.0
    */
   stop() {
     this.running = false;
