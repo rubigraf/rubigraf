@@ -49,8 +49,24 @@ class BaseContext<T extends Update = Update> {
     });
   }
 
+  /**
+   * Gets bot's information.
+   *
+   * @since v1.0.0
+   */
   public async getMe() {
     return await this.bot.getMe();
+  }
+
+  /**
+   * Send a poll to a chat.
+   *
+   * @param question Question text content
+   * @param options Poll's options
+   * @since v1.0.0
+   */
+  public async sendPoll(question: string, options: string[]) {
+    return await this.bot.sendPoll(this.chatId, question, options);
   }
 }
 

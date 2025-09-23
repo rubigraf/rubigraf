@@ -16,6 +16,7 @@ import type {
   CommandUpdate,
   Bot,
   SendMessageOptions,
+  Poll,
 } from "../types";
 import { compose } from "./middleware";
 import { RubigrafEvents } from "../symbols";
@@ -120,9 +121,15 @@ class Rubigraf extends Event {
    * @param text Message content
    * @param opts Send message options
    *
+   * @returns The ID of message
+   *
    * @since v1.0.0
    */
-  async sendMessage(chatId: string, text: string, opts?: SendMessageOptions): Promise<Message> {
+  async sendMessage(
+    chatId: string,
+    text: string,
+    opts?: SendMessageOptions
+  ): Promise<Message["message_id"]> {
     const payload: Record<string, any> = {
       chat_id: chatId,
       text,
@@ -134,16 +141,54 @@ class Rubigraf extends Event {
       if (opts.disableNotification) payload.disable_notification = opts.disableNotification;
       if (opts.inlineKeypad) payload.inline_keypad = opts.inlineKeypad;
       if (opts.replyToMessageId) payload.reply_to_message_id = opts.replyToMessageId;
-
     }
 
-    const res = await this.http.request<APIResponse<Message>>("POST", "sendMessage", payload);
+    const res = await this.http.request<APIResponse<{ message_id: Message["message_id"] }>>(
+      "POST",
+      "sendMessage",
+      payload
+    );
 
     if (res.status !== "OK") {
       throw new Error(`sendMessage failed due to "${res.status}" status.`);
     }
 
-    return res.data;
+    return res.data.message_id;
+  }
+
+  /**
+   * Send a poll to a chat.
+   *
+   * @param chatId Target chat ID
+   * @param question Question text content
+   * @param options Poll's options
+   *
+   * @returns The ID of message
+   *
+   * @since v1.0.0
+   */
+  async sendPoll(
+    chatId: string,
+    question: string,
+    options: string[]
+  ): Promise<Message["message_id"]> {
+    if (!options.length) throw new Error("Poll's options legnth must be higher than 0...");
+
+    const res = await this.http.request<APIResponse<{ message_id: Message["message_id"] }>>(
+      "POST",
+      "sendPoll",
+      {
+        chat_id: chatId,
+        question,
+        options,
+      }
+    );
+
+    if (res.status !== "OK") {
+      throw new Error(`sendPoll failed due to "${res.status}" status.`);
+    }
+
+    return res.data.message_id;
   }
 
   /**
