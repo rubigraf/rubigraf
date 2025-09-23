@@ -26,6 +26,7 @@ import { isCommand, next } from "../helper";
 
 const DEFAULT_OPTS: Required<RubigrafOptions> = {
   baseURL: "https://botapi.rubika.ir/v3/",
+  freshnessWindow: 5,
   pollIntervalMs: 2000,
 };
 
@@ -42,6 +43,7 @@ class Rubigraf extends Event {
   private middlewares: Middleware[] = [];
   private running = false;
   private isOnLatestUpdate = false;
+  private lastUpdateTime = 0;
   private offset_id?: string;
   private composed = compose([]);
 
@@ -49,14 +51,14 @@ class Rubigraf extends Event {
    * Create a new Rubigraf instance.
    *
    * @param token Bot token
-   * @param opts Optional configuration (baseURL, pollIntervalMs)
+   * @param opts Optional configuration
    *
    * @since v1.0.0
    */
   constructor(private token: string, private opts: RubigrafOptions = {}) {
     super();
-    opts = { ...DEFAULT_OPTS, ...opts };
-    this.http = new HTTPClient({ baseURL: opts.baseURL!, token });
+    this.opts = { ...DEFAULT_OPTS, ...opts };
+    this.http = new HTTPClient({ baseURL: this.opts.baseURL!, token });
     this.composed = compose(this.middlewares);
   }
 
@@ -121,30 +123,21 @@ class Rubigraf extends Event {
    * @since v1.0.0
    */
   async sendMessage(chatId: string, text: string, opts?: SendMessageOptions): Promise<Message> {
-    let res: APIResponse<Message>;
-
-    const req = async (body: object) => {
-      return await this.http.request<APIResponse<Message>>("POST", "sendMessage", body);
+    const payload: Record<string, any> = {
+      chat_id: chatId,
+      text,
     };
 
     if (opts) {
-      const payload: Record<string, any> = {
-        chat_id: chatId,
-        text,
-      };
       if (opts.chatKeypad) payload.chat_keypad = opts.chatKeypad;
       if (opts.chatKeypadType) payload.chat_keypad_type = opts.chatKeypadType;
       if (opts.disableNotification) payload.disable_notification = opts.disableNotification;
       if (opts.inlineKeypad) payload.inline_keypad = opts.inlineKeypad;
       if (opts.replyToMessageId) payload.reply_to_message_id = opts.replyToMessageId;
 
-      res = await req(payload);
-    } else {
-      res = await req({
-        chat_id: chatId,
-        text,
-      });
     }
+
+    const res = await this.http.request<APIResponse<Message>>("POST", "sendMessage", payload);
 
     if (res.status !== "OK") {
       throw new Error(`sendMessage failed due to "${res.status}" status.`);
@@ -216,9 +209,6 @@ class Rubigraf extends Event {
   /**
    * Start the long-polling loop.
    *
-   * Applies time-based filtering: only updates created within
-   * `pollIntervalMs` are processed.
-   *
    * @since v1.0.0
    */
   async launch() {
@@ -234,10 +224,15 @@ class Rubigraf extends Event {
           if (u.type === UpdateTypeEnum.NewMessage || u.type === UpdateTypeEnum.UpdatedMessage) {
             const now = Math.floor(Date.now() / 1000);
             const time =
-              u.type === UpdateTypeEnum.NewMessage ? u.new_message.time : u.updated_message.time;
+              u.type === UpdateTypeEnum.NewMessage
+                ? u.new_message.time
+                : u.updated_message.time || this.lastUpdateTime + 1;
 
-            const maxAge = Math.floor(this.opts.pollIntervalMs! / 1000);
-            if (now - time > maxAge) continue;
+            if (time <= this.lastUpdateTime) continue;
+            if (!this.opts.freshnessWindow) continue;
+            if (now - time > this.opts.freshnessWindow) continue;
+
+            this.lastUpdateTime = Math.max(this.lastUpdateTime, time);
           }
 
           await this.handleUpdate(u);
@@ -254,7 +249,7 @@ class Rubigraf extends Event {
         await this.emitAsync(RubigrafEvents.Error, err, next);
       }
 
-      await new Promise((r) => setTimeout(r, interval));
+      // await new Promise((r) => setTimeout(r, interval));
     }
   }
 
