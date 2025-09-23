@@ -3,6 +3,7 @@ import { Keypad } from "../rubika";
 
 interface RubigrafOptions {
   baseURL?: string;
+  freshnessWindow?: number;
   pollIntervalMs?: number;
 }
 
