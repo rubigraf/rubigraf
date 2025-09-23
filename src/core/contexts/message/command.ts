@@ -15,10 +15,12 @@ class CommandContext extends BaseMessageContext<CommandUpdate> {
   constructor(update: CommandUpdate, bot: Rubigraf) {
     super(update, bot);
 
-    const splited = this.message.text?.split(" ");
-    if (splited && splited.length > 0) {
-      if (splited.length > 1) this.subCommands = splited.slice(1);
-      this.cmd = splited[0].slice(1) ?? null;
+    const splited = update.new_message.text?.match(/"([^"]+)"|(\S+)/g) ?? [];
+    if (splited.length > 0) {
+      this.cmd = splited[0]?.slice(1) || null;
+      if (splited.length > 1) {
+        this.subCommands = splited.slice(1).map((s) => s.replace(/(^")|("$)/g, ""));
+      }
     }
   }
 
@@ -52,7 +54,7 @@ class CommandContext extends BaseMessageContext<CommandUpdate> {
    *
    * @example
    * ```ts
-   * if (ctx.subCommand[0] === "option1") {
+   * if (ctx.subCommand[0] === "option1" || ctx.subCommand[0] === "some text goes here") {
    *   // do something
    * }
    * ```
