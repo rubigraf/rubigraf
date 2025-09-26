@@ -63,10 +63,41 @@ class BaseContext<T extends Update = Update> {
    *
    * @param question Question text content
    * @param options Poll's options
+   * @param replyTo The message ID to reply to
+   * @param disableNotification Whether notification should be disabled or not
    * @since v1.0.0
    */
-  public async sendPoll(question: string, options: string[]) {
-    return await this.bot.sendPoll(this.chatId, question, options);
+  public async sendPoll(
+    question: string,
+    options: string[],
+    replyTo?: string,
+    disableNotification?: boolean
+  ) {
+    return await this.bot.sendPoll(this.chatId, question, options, {
+      replyToMessageId: replyTo,
+      disableNotification,
+    });
+  }
+
+  /**
+   * Send a location to a chat.
+   *
+   * @param latitude Latitude of the location
+   * @param longitude Longitude of the location
+   * @param replyTo The message ID to reply to
+   * @param disableNotification Whether notification should be disabled or not
+   * @since v1.0.0
+   */
+  public async sendLocation(
+    latitude: string,
+    longitude: string,
+    replyTo?: string,
+    disableNotification?: boolean
+  ) {
+    return await this.bot.sendLocation(this.chatId, latitude, longitude, {
+      replyToMessageId: replyTo,
+      disableNotification,
+    });
   }
 }
 

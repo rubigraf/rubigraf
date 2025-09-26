@@ -21,7 +21,7 @@ import { UpdateTypeEnum } from "../enums";
 import { Context } from "../types";
 import { createContext } from "./contexts";
 import { isCommand, next } from "../helper";
-import { MethodError } from "../errors";
+import { MethodError, PollLengthError } from "../errors";
 import { FetchEngine, HTTPClient } from "./network";
 
 const DEFAULT_OPTS: Required<RubigrafOptions> = {
@@ -82,6 +82,28 @@ class Rubigraf extends Event {
   }
 
   /**
+   * @param payload The payload
+   * @param opts The options of message
+   * @returns The payload
+   *
+   * @since v1.0.0
+   */
+  private fillSendMessagePayload<T extends Record<string, any>>(
+    payload: T,
+    opts?: SendMessageOptions
+  ): T {
+    if (!opts) return payload;
+
+    if (opts.chatKeypad) (payload.chat_keypad as any) = opts.chatKeypad;
+    if (opts.chatKeypadType) (payload.chat_keypad_type as any) = opts.chatKeypadType;
+    if (opts.disableNotification) (payload.disable_notification as any) = opts.disableNotification;
+    if (opts.inlineKeypad) (payload.inline_keypad as any) = opts.inlineKeypad;
+    if (opts.replyToMessageId) (payload.reply_to_message_id as any) = opts.replyToMessageId;
+
+    return payload;
+  }
+
+  /**
    * Gets bot's info.
    *
    * @since v1.0.0
@@ -101,7 +123,7 @@ class Rubigraf extends Event {
    * @param text Message content
    * @param opts Send message options
    *
-   * @returns The ID of message
+   * @returns The ID of the sent message
    *
    * @since v1.0.0
    */
@@ -110,18 +132,13 @@ class Rubigraf extends Event {
     text: string,
     opts?: SendMessageOptions
   ): Promise<Message["message_id"]> {
-    const payload: Record<string, any> = {
-      chat_id: chatId,
-      text,
-    };
-
-    if (opts) {
-      if (opts.chatKeypad) payload.chat_keypad = opts.chatKeypad;
-      if (opts.chatKeypadType) payload.chat_keypad_type = opts.chatKeypadType;
-      if (opts.disableNotification) payload.disable_notification = opts.disableNotification;
-      if (opts.inlineKeypad) payload.inline_keypad = opts.inlineKeypad;
-      if (opts.replyToMessageId) payload.reply_to_message_id = opts.replyToMessageId;
-    }
+    const payload: Record<string, any> = this.fillSendMessagePayload(
+      {
+        chat_id: chatId,
+        text,
+      },
+      opts
+    );
 
     const res = await this.http.request<APIResponse<{ message_id: Message["message_id"] }>>(
       "POST",
@@ -140,29 +157,74 @@ class Rubigraf extends Event {
    * @param chatId Target chat ID
    * @param question Question text content
    * @param options Poll's options
+   * @param opts Send message options
    *
-   * @returns The ID of message
+   * @returns The ID of the sent message
    *
    * @since v1.0.0
    */
   async sendPoll(
     chatId: string,
     question: string,
-    options: string[]
+    options: string[],
+    opts?: SendMessageOptions
   ): Promise<Message["message_id"]> {
-    if (!options.length) throw new Error("Poll's options legnth must be higher than 0...");
+    if (!options.length) throw new PollLengthError();
 
-    const res = await this.http.request<APIResponse<{ message_id: Message["message_id"] }>>(
-      "POST",
-      "sendPoll",
+    const payload = this.fillSendMessagePayload(
       {
         chat_id: chatId,
         question,
         options,
-      }
+      },
+      opts
+    );
+
+    const res = await this.http.request<APIResponse<{ message_id: Message["message_id"] }>>(
+      "POST",
+      "sendPoll",
+      payload
     );
 
     if (res.status !== "OK") throw new MethodError("sendPoll", res.status);
+
+    return res.data.message_id;
+  }
+
+  /**
+   * Send a location to a chat.
+   *
+   * @param chatId Target chat ID
+   * @param latitude Latitude of the location
+   * @param longitude Longitude of the location
+   * @param opts Send message options
+   *
+   * @returns The ID of the sent message
+   *
+   * @since v1.0.0
+   */
+  async sendLocation(
+    chatId: string,
+    latitude: string,
+    longitude: string,
+    opts?: SendMessageOptions
+  ): Promise<Message["message_id"]> {
+    const payload = this.fillSendMessagePayload(
+      {
+        chat_id: chatId,
+        latitude,
+        longitude,
+      },
+      opts
+    );
+
+    const res = await this.http.request<APIResponse<{ message_id: Message["message_id"] }>>(
+      "POST",
+      "sendLocation",
+      payload
+    );
+
+    if (res.status !== "OK") throw new MethodError("sendLocation", res.status);
 
     return res.data.message_id;
   }
