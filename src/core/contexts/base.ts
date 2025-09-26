@@ -99,6 +99,33 @@ class BaseContext<T extends Update = Update> {
       disableNotification,
     });
   }
+
+  /**
+   * Send a contact to a chat.
+   *
+   * @param firstName The first name of the contact
+   * @param lastName The last name of the contact
+   * @param phone The phone number of the contact (notice: don't put 0 at first)
+   * @since v1.0.0
+   */
+  public async sendContact(
+    firstName: string,
+    lastName: string,
+    phone: number,
+    replyTo?: string,
+    disableNotification?: boolean
+  ) {
+    return await this.bot.sendContact(
+      this.chatId,
+      firstName,
+      lastName,
+      phone.toString().startsWith("98") ? phone : parseInt(`98${phone}`),
+      {
+        replyToMessageId: replyTo,
+        disableNotification,
+      }
+    );
+  }
 }
 
 export { BaseContext };

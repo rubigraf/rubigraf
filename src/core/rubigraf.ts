@@ -230,6 +230,47 @@ class Rubigraf extends Event {
   }
 
   /**
+   * Send a contact to a chat.
+   *
+   * @param chatId Target chat ID
+   * @param firstName The first name of the contact
+   * @param lastName The last name of the contact
+   * @param phone The phone number of the contact (notice: don't put 0 at first)
+   * @param opts Send message options
+   *
+   * @returns The ID of the sent message
+   *
+   * @since v1.0.0
+   */
+  async sendContact(
+    chatId: string,
+    firstName: string,
+    lastName: string,
+    phone: number,
+    opts?: SendMessageOptions
+  ): Promise<Message["message_id"]> {
+    const payload = this.fillSendMessagePayload(
+      {
+        chat_id: chatId,
+        first_name: firstName,
+        last_name: lastName,
+        phone_number: phone,
+      },
+      opts
+    );
+
+    const res = await this.http.request<APIResponse<{ message_id: Message["message_id"] }>>(
+      "POST",
+      "sendContact",
+      payload
+    );
+
+    if (res.status !== "OK") throw new MethodError("sendContact", res.status);
+
+    return res.data.message_id;
+  }
+
+  /**
    * Handle a single update.
    *
    * @param update Update payload from API
