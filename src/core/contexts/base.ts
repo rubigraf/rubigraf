@@ -126,6 +126,15 @@ class BaseContext<T extends Update = Update> {
       }
     );
   }
+
+  /**
+   * Gets a chat by message ID.
+   *
+   * @since v1.0.0
+   */
+  public async getChat() {
+    return await this.bot.getChat(this.chatId);
+  }
 }
 
 export { BaseContext };

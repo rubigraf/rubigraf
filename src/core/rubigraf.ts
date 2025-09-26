@@ -14,6 +14,7 @@ import type {
   CommandUpdate,
   Bot,
   SendMessageOptions,
+  Chat,
 } from "../types";
 import { compose } from "./middleware";
 import { RubigrafEvents } from "../symbols";
@@ -268,6 +269,29 @@ class Rubigraf extends Event {
     if (res.status !== "OK") throw new MethodError("sendContact", res.status);
 
     return res.data.message_id;
+  }
+
+  /**
+   * Gets a chat by message ID.
+   *
+   * @param chatId Target chat ID
+   *
+   * @returns The Chat type
+   *
+   * @since v1.0.0
+   */
+  async getChat(chatId: string): Promise<Chat> {
+    const res = await this.http.request<APIResponse<{ chat: Chat }>>(
+      "POST",
+      "getChat",
+      {
+        chat_id: chatId,
+      }
+    );
+
+    if (res.status !== "OK") throw new MethodError("getChat", res.status);
+
+    return res.data.chat;
   }
 
   /**
