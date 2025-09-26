@@ -1,4 +1,4 @@
-import type { HTTPClientOptions, HTTPMethod } from "../types";
+import type { HTTPClientOptions, HTTPMethod } from "../../types";
 
 /**
  * Minimal HTTP client using global fetch (Node 18+).

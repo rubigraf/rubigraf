@@ -1,5 +1,4 @@
 import Event from "./event";
-import HTTPClient from "./http";
 import type {
   Update,
   Message,
@@ -11,12 +10,10 @@ import type {
   StoppedBotUpdate,
   UpdatedMessageUpdate,
   UpdatedPaymentUpdate,
-  GetUpdatesResponse,
   Middleware,
   CommandUpdate,
   Bot,
   SendMessageOptions,
-  Poll,
 } from "../types";
 import { compose } from "./middleware";
 import { RubigrafEvents } from "../symbols";
@@ -24,6 +21,8 @@ import { UpdateTypeEnum } from "../enums";
 import { Context } from "../types";
 import { createContext } from "./contexts";
 import { isCommand, next } from "../helper";
+import { MethodError } from "../errors";
+import { FetchEngine, HTTPClient } from "./network";
 
 const DEFAULT_OPTS: Required<RubigrafOptions> = {
   baseURL: "https://botapi.rubika.ir/v3/",
@@ -41,11 +40,8 @@ const DEFAULT_OPTS: Required<RubigrafOptions> = {
  */
 class Rubigraf extends Event {
   private http: HTTPClient;
+  private engine: FetchEngine;
   private middlewares: Middleware[] = [];
-  private running = false;
-  private isOnLatestUpdate = false;
-  private lastUpdateTime = 0;
-  private offset_id?: string;
   private composed = compose([]);
 
   /**
@@ -60,6 +56,15 @@ class Rubigraf extends Event {
     super();
     this.opts = { ...DEFAULT_OPTS, ...opts };
     this.http = new HTTPClient({ baseURL: this.opts.baseURL!, token });
+    this.engine = new FetchEngine(
+      this.http,
+      {
+        freshnessWindow: opts.freshnessWindow || DEFAULT_OPTS.freshnessWindow,
+        pollIntervalMs: opts.pollIntervalMs || DEFAULT_OPTS.pollIntervalMs,
+      },
+      this.handleUpdate.bind(this),
+      async (err) => await this.emitAsync(RubigrafEvents.Error, err, next)
+    );
     this.composed = compose(this.middlewares);
   }
 
@@ -77,29 +82,6 @@ class Rubigraf extends Event {
   }
 
   /**
-   * Fetch updates from the API.
-   *
-   * @param offset_id Update offset_id for pagination
-   * @param limit Max number of updates to fetch
-   *
-   * @since v1.0.0
-   */
-  private async getUpdates(
-    offset_id?: string,
-    limit?: number
-  ): Promise<APIResponse<GetUpdatesResponse>["data"]> {
-    const res = await this.http.request<APIResponse<GetUpdatesResponse>>("POST", "getUpdates", {
-      offset_id,
-      limit,
-    });
-
-    if (res.status !== "OK") {
-      throw new Error(`getUpdates failed due to "${res.status}" status.`);
-    }
-    return res.data;
-  }
-
-  /**
    * Gets bot's info.
    *
    * @since v1.0.0
@@ -107,9 +89,7 @@ class Rubigraf extends Event {
   async getMe(): Promise<Bot> {
     const res = await this.http.request<APIResponse<Record<"bot", Bot>>>("POST", "getMe");
 
-    if (res.status !== "OK") {
-      throw new Error(`getMe failed due to "${res.status}" status.`);
-    }
+    if (res.status !== "OK") throw new MethodError("getMe", res.status);
 
     return res.data.bot;
   }
@@ -149,9 +129,7 @@ class Rubigraf extends Event {
       payload
     );
 
-    if (res.status !== "OK") {
-      throw new Error(`sendMessage failed due to "${res.status}" status.`);
-    }
+    if (res.status !== "OK") throw new MethodError("sendMessage", res.status);
 
     return res.data.message_id;
   }
@@ -184,9 +162,7 @@ class Rubigraf extends Event {
       }
     );
 
-    if (res.status !== "OK") {
-      throw new Error(`sendPoll failed due to "${res.status}" status.`);
-    }
+    if (res.status !== "OK") throw new MethodError("sendPoll", res.status);
 
     return res.data.message_id;
   }
@@ -257,45 +233,7 @@ class Rubigraf extends Event {
    * @since v1.0.0
    */
   async launch() {
-    if (this.running) return;
-    this.running = true;
-    const interval = this.opts.pollIntervalMs ?? 1500;
-
-    while (this.running) {
-      try {
-        const updates = await this.getUpdates(this.offset_id);
-
-        for (const u of updates.updates) {
-          if (u.type === UpdateTypeEnum.NewMessage || u.type === UpdateTypeEnum.UpdatedMessage) {
-            const now = Math.floor(Date.now() / 1000);
-            const time =
-              u.type === UpdateTypeEnum.NewMessage
-                ? u.new_message.time
-                : u.updated_message.time || this.lastUpdateTime + 1;
-
-            if (time <= this.lastUpdateTime) continue;
-            if (!this.opts.freshnessWindow) continue;
-            if (now - time > this.opts.freshnessWindow) continue;
-
-            this.lastUpdateTime = Math.max(this.lastUpdateTime, time);
-          }
-
-          await this.handleUpdate(u);
-        }
-
-        this.offset_id = updates.next_offset_id || this.offset_id;
-
-        if (updates.next_offset_id) continue;
-        if (!this.isOnLatestUpdate) {
-          console.log("Rubigraf is up & running...");
-          this.isOnLatestUpdate = true;
-        }
-      } catch (err) {
-        await this.emitAsync(RubigrafEvents.Error, err, next);
-      }
-
-      // await new Promise((r) => setTimeout(r, interval));
-    }
+    await this.engine.start();
   }
 
   /**
@@ -304,7 +242,7 @@ class Rubigraf extends Event {
    * @since v1.0.0
    */
   stop() {
-    this.running = false;
+    this.engine.stop();
   }
 }
 
