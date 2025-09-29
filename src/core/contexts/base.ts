@@ -135,6 +135,25 @@ class BaseContext<T extends Update = Update> {
   public async getChat() {
     return await this.bot.getChat(this.chatId);
   }
+
+  /**
+   * Forwards a message to a chat by message ID.
+   *
+   * @param originChatId Origin chat ID
+   * @param destChatId Destination chat ID
+   * @param messageId Target message ID
+   * @param disableNotif Whether to disable notification or not
+   *
+   * @since v1.0.0
+   */
+  public async forwardMessage(
+    originChatId: string,
+    destChatId: string,
+    messageId: string,
+    disableNotif?: boolean
+  ) {
+    return await this.bot.forwardMessage(originChatId, destChatId, messageId, disableNotif);
+  }
 }
 
 export { BaseContext };

@@ -281,17 +281,47 @@ class Rubigraf extends Event {
    * @since v1.0.0
    */
   async getChat(chatId: string): Promise<Chat> {
-    const res = await this.http.request<APIResponse<{ chat: Chat }>>(
-      "POST",
-      "getChat",
-      {
-        chat_id: chatId,
-      }
-    );
+    const res = await this.http.request<APIResponse<{ chat: Chat }>>("POST", "getChat", {
+      chat_id: chatId,
+    });
 
     if (res.status !== "OK") throw new MethodError("getChat", res.status);
 
     return res.data.chat;
+  }
+
+  /**
+   * Forwards a message to a chat by message ID.
+   *
+   * @param origin Origin chat ID
+   * @param destination Destination chat ID
+   * @param messageId Target message ID
+   * @param disable_notification Whether to disable notification or not
+   *
+   * @returns The new message ID
+   *
+   * @since v1.0.0
+   */
+  async forwardMessage(
+    origin: string,
+    destination: string,
+    messageId: string,
+    disable_notification?: boolean
+  ): Promise<Message["message_id"]> {
+    const res = await this.http.request<APIResponse<{ new_message_id: Message["message_id"] }>>(
+      "POST",
+      "forwardMessage",
+      {
+        from_chat_id: origin,
+        message_id: messageId,
+        to_chat_id: destination,
+        disable_notification,
+      }
+    );
+
+    if (res.status !== "OK") throw new MethodError("forwardMessage", res.status);
+
+    return res.data.new_message_id;
   }
 
   /**
