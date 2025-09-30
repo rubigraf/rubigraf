@@ -1,4 +1,4 @@
-import { Update } from "../../types";
+import type { Keypad, Update } from "../../types";
 import Rubigraf from "../rubigraf";
 
 /**
@@ -158,14 +158,27 @@ class BaseContext<T extends Update = Update> {
   /**
    * Edits a message by their chat and message ID.
    *
-   * @param messageId Target message ID
+   * @param messageId Target message ID (Will use current `chat_id` if not provided)
    * @param text The new text to replace with old one
-   * @param chatId Target chat ID (will use {@link Update}'s `chat_id` if not provided)
+   * @param chatId Target chat ID (will use current {@link Update}'s `chat_id` if not provided)
    *
    * @since v1.0.0
    */
   public async editMessageText(messageId: string, text: string, chatId?: string) {
     await this.bot.editMessageText(chatId || this.chatId, messageId, text);
+  }
+
+  /**
+   * Edits a keypad by their chat and message ID.
+   *
+   * @param messageId Target message ID
+   * @param keypad The new keypad to replace with old one
+   * @param chatId Target chat ID (Will use current {@link Update}'s `chat_id` if not provided)
+   *
+   * @since v1.0.0
+   */
+  public async editMessageKeypad(messageId: string, keypad: Keypad, chatId?: string) {
+    await this.bot.editMessageKeypad(chatId || this.chatId, messageId, keypad);
   }
 }
 

@@ -15,6 +15,7 @@ import type {
   Bot,
   SendMessageOptions,
   Chat,
+  Keypad,
 } from "../types";
 import { compose } from "./middleware";
 import { RubigrafEvents } from "../symbols";
@@ -333,22 +334,33 @@ class Rubigraf extends Event {
    *
    * @since v1.0.0
    */
-  async editMessageText(
-    chatId: string,
-    messageId: string,
-    text: string,
-  ): Promise<void> {
-    const res = await this.http.request<APIResponse<null>>(
-      "POST",
-      "editMessageText",
-      {
-        chat_id: chatId,
-        message_id: messageId,
-        text,
-      }
-    );
+  async editMessageText(chatId: string, messageId: string, text: string): Promise<void> {
+    const res = await this.http.request<APIResponse<null>>("POST", "editMessageText", {
+      chat_id: chatId,
+      message_id: messageId,
+      text,
+    });
 
     if (res.status !== "OK") throw new MethodError("editMessageText", res.status);
+  }
+
+  /**
+   * Edits a keypad by their chat and message ID.
+   *
+   * @param chatId Target chat ID
+   * @param messageId Target message ID
+   * @param keypad The new keypad to replace with old one
+   *
+   * @since v1.0.0
+   */
+  async editMessageKeypad(chatId: string, messageId: string, keypad: Keypad): Promise<void> {
+    const res = await this.http.request<APIResponse<null>>("POST", "editMessageKeypad", {
+      chat_id: chatId,
+      message_id: messageId,
+      inline_keypad: keypad,
+    });
+
+    if (res.status !== "OK") throw new MethodError("editMessageKeypad", res.status);
   }
 
   /**
