@@ -8,6 +8,10 @@ type Methods =
   | "getUpdates"
   | "forwardMessage"
   | "editMessageText"
-  | "deleteMessage";
+  | "editMessageKeypad"
+  | "deleteMessage"
+  | "setCommands"
+  | "updateBotEndpoints"
+  | "editChatKeypad";
 
 export type { Methods };
