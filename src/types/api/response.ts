@@ -1,6 +1,6 @@
 import { Update } from "../rubika";
 
-type APIStatus = "OK" | "INVALID_INPUT" | "SERVER_ERROR" | "TOO_REQUESTS";
+type APIStatus = "OK" | "INVALID_INPUT" | "SERVER_ERROR" | "TOO_REQUESTS" | "INVALID_ACCESS";
 
 interface APIResponse<T> {
   /** Indicates if the request was successful */
