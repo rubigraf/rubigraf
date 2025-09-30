@@ -1,4 +1,8 @@
-import { CommandUpdate, Message, NewMessageUpdate, UpdatedMessageUpdate } from "../../../types";
+import type {
+  Message,
+  NewMessageUpdate,
+  UpdatedMessageUpdate,
+} from "../../../types";
 import { BaseContext } from "../base";
 
 /**
@@ -8,7 +12,7 @@ import { BaseContext } from "../base";
  * @since v1.0.0
  */
 abstract class BaseMessageContext<
-  T extends CommandUpdate | NewMessageUpdate | UpdatedMessageUpdate = NewMessageUpdate
+  T extends NewMessageUpdate | UpdatedMessageUpdate = NewMessageUpdate
 > extends BaseContext<T> {
   public abstract get message(): Message;
 

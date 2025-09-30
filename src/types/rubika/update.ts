@@ -1,4 +1,5 @@
 import type { UpdateTypeEnum } from "../../enums";
+import { RubigrafEvents } from "../../symbols";
 import type { Message } from "./message";
 import type { PaymentStatus } from "./paymentStatus";
 
@@ -59,7 +60,11 @@ type UpdateMap = {
 
 // Helper types
 
-type CommandUpdate = UpdateMap[UpdateTypeEnum.NewMessage];
+// Note: For determining each Update type for sub events like CommandUpdate we need to make
+// another unique property which will never accessible in the runtime but in compile-time
+// to determine the types correctly.
+type CommandUpdate = NewMessageUpdate & { readonly [RubigrafEvents.Command]: never };
+type ContactUpdate = NewMessageUpdate & { readonly [RubigrafEvents.Contact]: never };
 type NewMessageUpdate = UpdateMap[UpdateTypeEnum.NewMessage];
 type RemovedMessageUpdate = UpdateMap[UpdateTypeEnum.RemovedMessage];
 type StartedBotUpdate = UpdateMap[UpdateTypeEnum.StartedBot];
@@ -70,6 +75,7 @@ type UpdatedPaymentUpdate = UpdateMap[UpdateTypeEnum.UpdatedPayment];
 export type {
   BaseUpdate,
   CommandUpdate,
+  ContactUpdate,
   NewMessageUpdate,
   RemovedMessageUpdate,
   StartedBotUpdate,

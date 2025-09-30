@@ -17,6 +17,7 @@ import type {
   Chat,
   Keypad,
   BotCommand,
+  ContactUpdate,
 } from "../types";
 import { compose } from "./middleware";
 import { RubigrafEvents } from "../symbols";
@@ -459,6 +460,10 @@ class Rubigraf extends Event {
         const m = update.new_message;
         if (isCommand(m.text || "")) {
           await this.emitAsync(RubigrafEvents.Command, ctx as Context<CommandUpdate>, next);
+        }
+
+        if (update.new_message.contact_message) {
+          await this.emitAsync(RubigrafEvents.Contact, ctx as Context<ContactUpdate>, next);
         }
 
         await this.emitAsync(RubigrafEvents.NewMessage, ctx as Context<NewMessageUpdate>, next);

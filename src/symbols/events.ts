@@ -1,19 +1,19 @@
-import {
+import type {
+  CommandUpdate,
+  ContactUpdate,
   Context,
-  Message,
   NewMessageUpdate,
   Next,
-  PaymentStatus,
   RemovedMessageUpdate,
   StartedBotUpdate,
   StoppedBotUpdate,
-  Update,
   UpdatedMessageUpdate,
   UpdatedPaymentUpdate,
 } from "../types";
 
 namespace RubigrafEvents {
   export const Command = Symbol("command");
+  export const Contact = Symbol("contact");
   export const Error = Symbol("error");
   export const NewMessage = Symbol("new_message");
   export const RemovedMessage = Symbol("removed_message");
@@ -24,7 +24,8 @@ namespace RubigrafEvents {
   export const Update = Symbol("update");
 
   export type Map = {
-    [Command]: [ctx: Context<NewMessageUpdate>, next: Next];
+    [Command]: [ctx: Context<CommandUpdate>, next: Next];
+    [Contact]: [ctx: Context<ContactUpdate>, next: Next];
     [Error]: [err: Error | string | unknown, next: Next];
     [NewMessage]: [ctx: Context<NewMessageUpdate>, next: Next];
     [RemovedMessage]: [ctx: Context<RemovedMessageUpdate>, next: Next];
@@ -40,5 +41,7 @@ namespace RubigrafEvents {
    */
   export type BotEventInstaller<C, K extends keyof Map> = (events: C) => (...args: Map[K]) => void;
 }
+
+let s: RubigrafEvents.Map[typeof RubigrafEvents.NewMessage];
 
 export { RubigrafEvents };

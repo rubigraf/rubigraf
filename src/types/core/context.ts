@@ -1,6 +1,7 @@
 import {
   BaseContext,
   CommandContext,
+  ContactContext,
   NewMessageContext,
   RemovedMessageContext,
   StartedBotContext,
@@ -10,6 +11,7 @@ import {
 } from "../../core/contexts";
 import type {
   CommandUpdate,
+  ContactUpdate,
   NewMessageUpdate,
   RemovedMessageUpdate,
   StartedBotUpdate,
@@ -21,6 +23,8 @@ import type {
 
 type Context<T extends Update = Update> = T extends CommandUpdate
   ? CommandContext
+  : T extends ContactUpdate
+  ? ContactContext
   : T extends NewMessageUpdate
   ? NewMessageContext
   : T extends RemovedMessageUpdate
