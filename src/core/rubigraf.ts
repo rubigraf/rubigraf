@@ -16,6 +16,7 @@ import type {
   SendMessageOptions,
   Chat,
   Keypad,
+  BotCommand,
 } from "../types";
 import { compose } from "./middleware";
 import { RubigrafEvents } from "../symbols";
@@ -378,6 +379,21 @@ class Rubigraf extends Event {
     });
 
     if (res.status !== "OK") throw new MethodError("deleteMessage", res.status);
+  }
+
+  /**
+   * Sets a list of commands for bot.
+   *
+   * @param commands The list of commands
+   *
+   * @since v1.0.0
+   */
+  async setCommands(commands: BotCommand[]): Promise<void> {
+    const res = await this.http.request<APIResponse<null>>("POST", "setCommands", {
+      bot_commands: commands,
+    });
+
+    if (res.status !== "OK") throw new MethodError("setCommands", res.status);
   }
 
   /**

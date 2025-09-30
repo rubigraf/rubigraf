@@ -1,4 +1,4 @@
-import type { Keypad, Update } from "../../types";
+import type { BotCommand, Keypad, Update } from "../../types";
 import Rubigraf from "../rubigraf";
 
 /**
@@ -191,6 +191,17 @@ class BaseContext<T extends Update = Update> {
    */
   public async deleteMessage(messageId: string, chatId?: string) {
     await this.bot.deleteMessage(chatId || this.chatId, messageId);
+  }
+
+  /**
+   * Sets a list of commands for bot.
+   *
+   * @param commands The list of commands
+   *
+   * @since v1.0.0
+   */
+  public async setCommands(commands: BotCommand[]): Promise<void> {
+    await this.bot.setCommands(commands);
   }
 }
 
