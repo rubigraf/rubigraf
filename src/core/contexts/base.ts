@@ -180,6 +180,18 @@ class BaseContext<T extends Update = Update> {
   public async editMessageKeypad(messageId: string, keypad: Keypad, chatId?: string) {
     await this.bot.editMessageKeypad(chatId || this.chatId, messageId, keypad);
   }
+
+  /**
+   * Deletes a message by their chat and message ID.
+   *
+   * @param messageId Target message ID
+   * @param chatId Target chat ID (Will use current {@link Update}'s `chat_id` if not provided)
+   *
+   * @since v1.0.0
+   */
+  public async deleteMessage(messageId: string, chatId?: string) {
+    await this.bot.deleteMessage(chatId || this.chatId, messageId);
+  }
 }
 
 export { BaseContext };

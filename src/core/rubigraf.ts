@@ -364,6 +364,23 @@ class Rubigraf extends Event {
   }
 
   /**
+   * Deletes a message by their chat and message ID.
+   *
+   * @param chatId Target chat ID
+   * @param messageId Target message ID
+   *
+   * @since v1.0.0
+   */
+  async deleteMessage(chatId: string, messageId: string): Promise<void> {
+    const res = await this.http.request<APIResponse<null>>("POST", "deleteMessage", {
+      chat_id: chatId,
+      message_id: messageId,
+    });
+
+    if (res.status !== "OK") throw new MethodError("deleteMessage", res.status);
+  }
+
+  /**
    * Handle a single update.
    *
    * @param update Update payload from API
