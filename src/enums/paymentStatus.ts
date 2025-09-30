@@ -4,7 +4,7 @@
  * @package rubigraf
  * @since v1.0.0
  */
-const enum PaymentStatusEnum {
+enum PaymentStatusEnum {
   Paid = "Paid",
   NotPaid = "NotPaid",
 }

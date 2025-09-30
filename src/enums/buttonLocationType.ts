@@ -4,7 +4,7 @@
  * @package rubigraf
  * @since v1.0.0
  */
-const enum ButtonLocationTypeEnum {
+enum ButtonLocationTypeEnum {
   Picker = "Picker",
   View = "View",
 }

@@ -4,7 +4,7 @@
  * @package rubigraf
  * @since v1.0.0
  */
-const enum ButtonSelectionTypeEnum {
+enum ButtonSelectionTypeEnum {
   TextOnly = "TextOnly",
   TextImgThu = "TextImgThu",
   TextImgBig = "TextImgBig",

@@ -4,7 +4,7 @@
  * @package rubigraf
  * @since v1.0.0
  */
-const enum ButtonTextboxTypeLineEnum {
+enum ButtonTextboxTypeLineEnum {
   /** Write a text message on one line */
   SingleLine = "SingleLine",
   /** Writing a text message on multiple lines */

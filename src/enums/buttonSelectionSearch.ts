@@ -4,7 +4,7 @@
  * @package rubigraf
  * @since v1.0.0
  */
-const enum ButtonSelectionSearchEnum {
+enum ButtonSelectionSearchEnum {
   /** @default */
   None = "None",
   /** Search list items using values ​​passed in the items field */

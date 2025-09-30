@@ -4,7 +4,7 @@
  * @package rubigraf
  * @since v1.0.0
  */
-const enum ButtonTextboxTypeKeypadEnum {
+enum ButtonTextboxTypeKeypadEnum {
   /** Ability to send all characters */
   String = "String",
   /** Ability to send numeric characters */

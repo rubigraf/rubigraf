@@ -4,7 +4,7 @@
  * @package rubigraf
  * @since v1.0.0
  */
-const enum ButtonCalendarTypeEnum {
+enum ButtonCalendarTypeEnum {
   /** Display calendar in Solar format */
   DatePersian = "DatePersian",
   /** Display calendar in Gregorian format */

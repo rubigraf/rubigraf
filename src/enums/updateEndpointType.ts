@@ -4,7 +4,7 @@
  * @package rubigraf
  * @since v1.0.0
  */
-const enum UpdateEndpointTypeEnum {
+enum UpdateEndpointTypeEnum {
   ReceiveUpdate = "ReceiveUpdate",
   ReceiveInlineMessage = "ReceiveInlineMessage",
   ReceiveQuery = "ReceiveQuery",

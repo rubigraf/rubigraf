@@ -4,7 +4,7 @@
  * @package rubigraf
  * @since v1.0.0
  */
-const enum PollStatusEnum {
+enum PollStatusEnum {
   Open = "Open",
   Closed = "Closed",
 }

@@ -4,7 +4,7 @@
  * @package rubigraf
  * @since v1.0.0
  */
-const enum MessageSenderEnum {
+enum MessageSenderEnum {
   User = "User",
   Bot = "Bot",
 }

@@ -4,7 +4,7 @@
  * @package rubigraf
  * @since v1.0.0
  */
-const enum LiveLocationStatusEnum {
+enum LiveLocationStatusEnum {
   Stopped = "Stopped",
   Live = "Live",
 }

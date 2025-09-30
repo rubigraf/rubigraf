@@ -4,7 +4,7 @@
  * @package rubigraf
  * @since v1.0.0
  */
-const enum ForwardedFromEnum {
+enum ForwardedFromEnum {
   User = "User",
   Channel = "Channel",
   Bot = "Bot",

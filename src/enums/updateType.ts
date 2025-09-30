@@ -4,7 +4,7 @@
  * @package rubigraf
  * @since v1.0.0
  */
-const enum UpdateTypeEnum {
+enum UpdateTypeEnum {
   UpdatedMessage = "UpdatedMessage",
   NewMessage = "NewMessage",
   RemovedMessage = "RemovedMessage",
