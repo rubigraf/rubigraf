@@ -20,7 +20,7 @@ import type {
 } from "../types";
 import { compose } from "./middleware";
 import { RubigrafEvents } from "../symbols";
-import { UpdateTypeEnum } from "../enums";
+import { UpdateEndpointTypeEnum, UpdateTypeEnum } from "../enums";
 import { Context } from "../types";
 import { createContext } from "./contexts";
 import { isCommand, next } from "../helper";
@@ -394,6 +394,23 @@ class Rubigraf extends Event {
     });
 
     if (res.status !== "OK") throw new MethodError("setCommands", res.status);
+  }
+
+  /**
+   * Sets a Webhook for the bot to get updates.
+   *
+   * @param url The url of the webhook
+   * @param type The type of the webhook
+   *
+   * @since v1.0.0
+   */
+  async setWebhook(url: string, type: UpdateEndpointTypeEnum): Promise<void> {
+    const res = await this.http.request<APIResponse<null>>("POST", "updateBotEndpoints", {
+      url,
+      type,
+    });
+
+    if (res.status !== "OK") throw new MethodError("updateBotEndpoints", res.status);
   }
 
   /**

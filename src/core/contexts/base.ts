@@ -1,3 +1,4 @@
+import { UpdateEndpointTypeEnum } from "../../enums";
 import type { BotCommand, Keypad, Update } from "../../types";
 import Rubigraf from "../rubigraf";
 
@@ -202,6 +203,18 @@ class BaseContext<T extends Update = Update> {
    */
   public async setCommands(commands: BotCommand[]): Promise<void> {
     await this.bot.setCommands(commands);
+  }
+
+  /**
+   * Sets a Webhook for the bot to get updates.
+   *
+   * @param url The url of the webhook
+   * @param type The type of the webhook
+   *
+   * @since v1.0.0
+   */
+  public async setWebhook(url: string, type: UpdateEndpointTypeEnum): Promise<void> {
+    await this.bot.setWebhook(url, type);
   }
 }
 
