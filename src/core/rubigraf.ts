@@ -20,11 +20,11 @@ import type {
 } from "../types";
 import { compose } from "./middleware";
 import { RubigrafEvents } from "../symbols";
-import { UpdateEndpointTypeEnum, UpdateTypeEnum } from "../enums";
+import { ChatKeypadTypeEnum, UpdateEndpointTypeEnum, UpdateTypeEnum } from "../enums";
 import { Context } from "../types";
 import { createContext } from "./contexts";
 import { isCommand, next } from "../helper";
-import { MethodError, PollLengthError } from "../errors";
+import { EditChatKeypadError, MethodError, PollLengthError } from "../errors";
 import { FetchEngine, HTTPClient } from "./network";
 
 const DEFAULT_OPTS: Required<RubigrafOptions> = {
@@ -411,6 +411,36 @@ class Rubigraf extends Event {
     });
 
     if (res.status !== "OK") throw new MethodError("updateBotEndpoints", res.status);
+  }
+
+  /**
+   * Edits or removes a keypad into the chat.
+   *
+   * @param chatId Target chat ID
+   * @param type Type of edit to apply to the keypad
+   * @param keypad It is required if `type` param is set to the {@link ChatKeypadTypeEnum.New New}
+   *
+   * @since v1.0.0
+   */
+  async editChatKeypad<T extends ChatKeypadTypeEnum.New | ChatKeypadTypeEnum.Remove>(
+    chatId: string,
+    type: T,
+    keypad: T extends ChatKeypadTypeEnum.New ? Keypad : undefined = undefined as any
+  ): Promise<void> {
+    if (type === ChatKeypadTypeEnum.New && keypad === undefined) throw new EditChatKeypadError();
+
+    let payload: any = {
+      chat_id: chatId,
+      chat_keypad_type: type,
+    };
+
+    if (type === ChatKeypadTypeEnum.New) {
+      payload.chat_keypad = keypad;
+    }
+
+    const res = await this.http.request<APIResponse<null>>("POST", "editChatKeypad", payload);
+
+    if (res.status !== "OK") throw new MethodError("editChatKeypad", res.status);
   }
 
   /**

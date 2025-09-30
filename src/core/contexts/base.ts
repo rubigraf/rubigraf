@@ -1,4 +1,4 @@
-import { UpdateEndpointTypeEnum } from "../../enums";
+import { ChatKeypadTypeEnum, UpdateEndpointTypeEnum } from "../../enums";
 import type { BotCommand, Keypad, Update } from "../../types";
 import Rubigraf from "../rubigraf";
 
@@ -215,6 +215,29 @@ class BaseContext<T extends Update = Update> {
    */
   public async setWebhook(url: string, type: UpdateEndpointTypeEnum): Promise<void> {
     await this.bot.setWebhook(url, type);
+  }
+
+  /**
+   * Sets a chat keypad into the chat.
+   *
+   * @param chatId Target chat ID
+   * @param keypad The keypad to apply
+   *
+   * @since v1.0.0
+   */
+  public async setChatKeypad(chatId: string, keypad: Keypad): Promise<void> {
+    await this.bot.editChatKeypad(chatId, ChatKeypadTypeEnum.New, keypad);
+  }
+
+  /**
+   * Clears chat keypad from the chat.
+   *
+   * @param chatId Target chat ID
+   *
+   * @since v1.0.0
+   */
+  public async clearChatKeypad(chatId: string): Promise<void> {
+    await this.bot.editChatKeypad(chatId, ChatKeypadTypeEnum.Remove);
   }
 }
 
