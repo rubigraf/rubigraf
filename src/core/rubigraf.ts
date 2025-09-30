@@ -325,6 +325,33 @@ class Rubigraf extends Event {
   }
 
   /**
+   * Edits a message by their chat and message ID.
+   *
+   * @param chatId Target chat ID
+   * @param messageId Target message ID
+   * @param text The new text to replace with old one
+   *
+   * @since v1.0.0
+   */
+  async editMessageText(
+    chatId: string,
+    messageId: string,
+    text: string,
+  ): Promise<void> {
+    const res = await this.http.request<APIResponse<null>>(
+      "POST",
+      "editMessageText",
+      {
+        chat_id: chatId,
+        message_id: messageId,
+        text,
+      }
+    );
+
+    if (res.status !== "OK") throw new MethodError("editMessageText", res.status);
+  }
+
+  /**
    * Handle a single update.
    *
    * @param update Update payload from API

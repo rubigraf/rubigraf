@@ -154,6 +154,19 @@ class BaseContext<T extends Update = Update> {
   ) {
     return await this.bot.forwardMessage(originChatId, destChatId, messageId, disableNotif);
   }
+
+  /**
+   * Edits a message by their chat and message ID.
+   *
+   * @param messageId Target message ID
+   * @param text The new text to replace with old one
+   * @param chatId Target chat ID (will use {@link Update}'s `chat_id` if not provided)
+   *
+   * @since v1.0.0
+   */
+  public async editMessageText(messageId: string, text: string, chatId?: string) {
+    await this.bot.editMessageText(chatId || this.chatId, messageId, text);
+  }
 }
 
 export { BaseContext };
