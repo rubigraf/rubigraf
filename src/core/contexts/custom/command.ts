@@ -1,6 +1,6 @@
 import { CommandUpdate } from "../../../types";
 import Rubigraf from "../../rubigraf";
-import { BaseMessageContext } from "./base";
+import { BaseCustomContext } from "./base";
 
 /**
  * Context related to `NewMessage` update but with Command specifics.
@@ -8,7 +8,7 @@ import { BaseMessageContext } from "./base";
  * @package rubigraf
  * @since v1.0.0
  */
-class CommandContext extends BaseMessageContext<CommandUpdate> {
+class CommandContext extends BaseCustomContext<CommandUpdate> {
   private subCommands: string[] = [];
   private cmd: string | null = null;
 

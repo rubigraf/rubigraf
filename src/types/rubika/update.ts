@@ -72,10 +72,13 @@ type StoppedBotUpdate = UpdateMap[UpdateTypeEnum.StoppedBot];
 type UpdatedMessageUpdate = UpdateMap[UpdateTypeEnum.UpdatedMessage];
 type UpdatedPaymentUpdate = UpdateMap[UpdateTypeEnum.UpdatedPayment];
 
+type CustomContextTypes = CommandUpdate | ContactUpdate;
+
 export type {
   BaseUpdate,
   CommandUpdate,
   ContactUpdate,
+  CustomContextTypes,
   NewMessageUpdate,
   RemovedMessageUpdate,
   StartedBotUpdate,

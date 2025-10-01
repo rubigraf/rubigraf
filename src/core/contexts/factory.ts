@@ -3,12 +3,7 @@ import { isCommand } from "../../helper";
 import { CommandUpdate, ContactUpdate, Context, Update } from "../../types";
 import Rubigraf from "../rubigraf";
 import { BaseContext } from "./base";
-import {
-  CommandContext,
-  ContactContext,
-  NewMessageContext,
-  UpdatedMessageContext,
-} from "./message";
+import { CommandContext, ContactContext, NewMessageContext, UpdatedMessageContext } from ".";
 import { RemovedMessageContext } from "./removeMessage";
 import { StartedBotContext } from "./startedBot";
 import { StoppedBotContext } from "./stoppedBot";

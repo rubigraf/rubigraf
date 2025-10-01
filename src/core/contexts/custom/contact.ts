@@ -1,5 +1,5 @@
 import { ContactUpdate } from "../../../types";
-import { BaseMessageContext } from "./base";
+import { BaseCustomContext } from "./base";
 
 /**
  * Context related to `NewMessage` update but with Contact specifics.
@@ -7,16 +7,7 @@ import { BaseMessageContext } from "./base";
  * @package rubigraf
  * @since v1.0.0
  */
-class ContactContext extends BaseMessageContext<ContactUpdate> {
-  /**
-   * Get the message related to `NewMessage` update but for {@link ContactContext}.
-   *
-   * @since v1.0.0
-   */
-  public get message() {
-    return this.update.new_message;
-  }
-
+class ContactContext extends BaseCustomContext<ContactUpdate> {
   /**
    * Get contact from the message.
    *
@@ -42,6 +33,15 @@ class ContactContext extends BaseMessageContext<ContactUpdate> {
    */
   public get last_name() {
     return this.contact.last_name;
+  }
+
+  /**
+   * Get the message related to `NewMessage` update but for {@link ContactContext}.
+   *
+   * @since v1.0.0
+   */
+  public get message() {
+    return this.update.new_message;
   }
 
   /**

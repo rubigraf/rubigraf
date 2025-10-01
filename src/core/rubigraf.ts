@@ -453,7 +453,7 @@ class Rubigraf extends Event {
    */
   async handleUpdate<U extends Update>(update: U) {
     const ctx = createContext(update, this);
-    await this.composed(ctx, async () => {});
+    await this.composed(ctx as Context<U>, async () => {});
 
     switch (update.type) {
       case UpdateTypeEnum.NewMessage:
@@ -505,7 +505,7 @@ class Rubigraf extends Event {
         break;
     }
 
-    await this.emitAsync(RubigrafEvents.Update, ctx, next);
+    await this.emitAsync(RubigrafEvents.Update, ctx as Context<U>, next);
   }
 
   /**
