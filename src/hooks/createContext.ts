@@ -1,19 +1,25 @@
-import { UpdateTypeEnum } from "../../enums";
-import { isCommand } from "../../helper";
-import { CommandUpdate, ContactUpdate, Context, Update } from "../../types";
-import Rubigraf from "../rubigraf";
-import { BaseContext } from "./base";
-import { CommandContext, ContactContext, NewMessageContext, UpdatedMessageContext } from ".";
-import { RemovedMessageContext } from "./removeMessage";
-import { StartedBotContext } from "./startedBot";
-import { StoppedBotContext } from "./stoppedBot";
-import { UpdatedPaymentContext } from "./updatedPayment";
+import {
+  CommandContext,
+  ContactContext,
+  NewMessageContext,
+  UpdatedMessageContext,
+  RemovedMessageContext,
+  StartedBotContext,
+  StoppedBotContext,
+  UpdatedPaymentContext,
+  BaseContext,
+} from "../core/contexts";
+import Rubigraf from "../core/rubigraf";
+import { UpdateTypeEnum } from "../enums";
+import { isCommand } from "../helper";
+import { Update, CommandUpdate, ContactUpdate, Context } from "../types";
 
 /**
+ * Creates a new context based on {@link U Update}'s type.
  *
- * @param update
- * @param bot
- * @returns
+ * @param update Used to determine type and create correct context based on it
+ * @param bot Used for context creation
+ * @returns Context
  */
 function createContext<U extends Update>(update: U, bot: Rubigraf): Context<U> {
   switch (update.type) {

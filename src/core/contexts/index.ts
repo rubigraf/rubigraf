@@ -1,5 +1,4 @@
 export * from "./base";
-export * from "./factory";
 export * from "./custom";
 export * from "./message";
 export * from "./removeMessage";

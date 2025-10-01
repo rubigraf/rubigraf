@@ -1,3 +1,4 @@
+import { parseCommand } from "../../../hooks";
 import { CommandUpdate } from "../../../types";
 import Rubigraf from "../../rubigraf";
 import { BaseCustomContext } from "./base";
@@ -9,19 +10,15 @@ import { BaseCustomContext } from "./base";
  * @since v1.0.0
  */
 class CommandContext extends BaseCustomContext<CommandUpdate> {
-  private subCommands: string[] = [];
   private cmd: string | null = null;
+  private subCommands: string[] = [];
 
   constructor(update: CommandUpdate, bot: Rubigraf) {
     super(update, bot);
 
-    const splited = update.new_message.text?.match(/"([^"]+)"|(\S+)/g) ?? [];
-    if (splited.length > 0) {
-      this.cmd = splited[0]?.slice(1) || null;
-      if (splited.length > 1) {
-        this.subCommands = splited.slice(1).map((s) => s.replace(/(^")|("$)/g, ""));
-      }
-    }
+    const { cmd, subCommands } = parseCommand(this.message.text);
+    this.cmd = cmd;
+    this.subCommands = subCommands;
   }
 
   /**

@@ -23,7 +23,7 @@ import { compose } from "./middleware";
 import { RubigrafEvents } from "../symbols";
 import { ChatKeypadTypeEnum, UpdateEndpointTypeEnum, UpdateTypeEnum } from "../enums";
 import { Context } from "../types";
-import { createContext } from "./contexts";
+import { createContext } from "../hooks";
 import { isCommand, next } from "../helper";
 import { EditChatKeypadError, MethodError, PollLengthError } from "../errors";
 import { FetchEngine, HTTPClient } from "./network";
