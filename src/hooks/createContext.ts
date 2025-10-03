@@ -8,11 +8,12 @@ import {
   StoppedBotContext,
   UpdatedPaymentContext,
   BaseContext,
+  FileContext,
 } from "../core/contexts";
 import Rubigraf from "../core/rubigraf";
 import { UpdateTypeEnum } from "../enums";
 import { isCommand } from "../helper";
-import { Update, CommandUpdate, ContactUpdate, Context } from "../types";
+import { Update, CommandUpdate, ContactUpdate, Context, FileUpdate } from "../types";
 
 /**
  * Creates a new context based on {@link U Update}'s type.
@@ -30,6 +31,10 @@ function createContext<U extends Update>(update: U, bot: Rubigraf): Context<U> {
 
       if (update.new_message.contact_message) {
         return new ContactContext(update as ContactUpdate, bot) as Context<U>;
+      }
+
+      if (update.new_message.file) {
+        return new FileContext(update as FileUpdate, bot) as Context<U>;
       }
 
       return new NewMessageContext(update, bot) as Context<U>;

@@ -2,6 +2,7 @@ import type {
   CommandUpdate,
   ContactUpdate,
   Context,
+  FileUpdate,
   NewMessageUpdate,
   Next,
   RemovedMessageUpdate,
@@ -15,6 +16,7 @@ namespace RubigrafEvents {
   export const Command = Symbol("command");
   export const Contact = Symbol("contact");
   export const Error = Symbol("error");
+  export const File = Symbol("file");
   export const NewMessage = Symbol("new_message");
   export const RemovedMessage = Symbol("removed_message");
   export const StartedBot = Symbol("started_bot");
@@ -27,6 +29,7 @@ namespace RubigrafEvents {
     [Command]: [ctx: Context<CommandUpdate>, next: Next];
     [Contact]: [ctx: Context<ContactUpdate>, next: Next];
     [Error]: [err: Error | string | unknown, next: Next];
+    [File]: [ctx: Context<FileUpdate>, next: Next];
     [NewMessage]: [ctx: Context<NewMessageUpdate>, next: Next];
     [RemovedMessage]: [ctx: Context<RemovedMessageUpdate>, next: Next];
     [StartedBot]: [ctx: Context<StartedBotUpdate>, next: Next];

@@ -65,6 +65,7 @@ type UpdateMap = {
 // to determine the types correctly.
 type CommandUpdate = NewMessageUpdate & { readonly [RubigrafEvents.Command]: never };
 type ContactUpdate = NewMessageUpdate & { readonly [RubigrafEvents.Contact]: never };
+type FileUpdate = NewMessageUpdate & { readonly [RubigrafEvents.File]: never };
 type NewMessageUpdate = UpdateMap[UpdateTypeEnum.NewMessage];
 type RemovedMessageUpdate = UpdateMap[UpdateTypeEnum.RemovedMessage];
 type StartedBotUpdate = UpdateMap[UpdateTypeEnum.StartedBot];
@@ -72,12 +73,13 @@ type StoppedBotUpdate = UpdateMap[UpdateTypeEnum.StoppedBot];
 type UpdatedMessageUpdate = UpdateMap[UpdateTypeEnum.UpdatedMessage];
 type UpdatedPaymentUpdate = UpdateMap[UpdateTypeEnum.UpdatedPayment];
 
-type CustomContextTypes = CommandUpdate | ContactUpdate;
+type CustomContextTypes = CommandUpdate | ContactUpdate | FileUpdate;
 
 export type {
   BaseUpdate,
   CommandUpdate,
   ContactUpdate,
+  FileUpdate,
   CustomContextTypes,
   NewMessageUpdate,
   RemovedMessageUpdate,

@@ -18,6 +18,7 @@ import type {
   Keypad,
   BotCommand,
   ContactUpdate,
+  FileUpdate,
 } from "../types";
 import { compose } from "./middleware";
 import { RubigrafEvents } from "../symbols";
@@ -464,6 +465,10 @@ class Rubigraf extends Event {
 
         if (update.new_message.contact_message) {
           await this.emitAsync(RubigrafEvents.Contact, ctx as Context<ContactUpdate>, next);
+        }
+
+        if (update.new_message.file) {
+          await this.emitAsync(RubigrafEvents.File, ctx as Context<FileUpdate>, next);
         }
 
         await this.emitAsync(RubigrafEvents.NewMessage, ctx as Context<NewMessageUpdate>, next);
