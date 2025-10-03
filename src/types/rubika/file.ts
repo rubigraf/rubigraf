@@ -10,7 +10,7 @@ interface File {
   /** Filename */
   file_name: string;
   /** File size in bytes (as string) */
-  size: string;
+  size: number;
 }
 
 export type { File };

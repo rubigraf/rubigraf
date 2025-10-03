@@ -1,6 +1,7 @@
 import type { MessageSenderEnum } from "../../enums";
 import type { AuxData } from "./auxData";
 import type { ContactMessage } from "./contactMessage";
+import type { File } from "./file";
 import type { ForwardedFrom } from "./forwardedFrom";
 import type { LiveLocation } from "./liveLocation";
 import type { Location } from "./location";
