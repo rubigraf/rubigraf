@@ -70,6 +70,7 @@ type ForwardedFromUpdate = NewMessageUpdate & { readonly [RubigrafEvents.Forward
 type LiveLocationUpdate = NewMessageUpdate & { readonly [RubigrafEvents.LiveLocation]: never };
 type LocationUpdate = NewMessageUpdate & { readonly [RubigrafEvents.Location]: never };
 type PollUpdate = NewMessageUpdate & { readonly [RubigrafEvents.Poll]: never };
+type StickerUpdate = NewMessageUpdate & { readonly [RubigrafEvents.Sticker]: never };
 type NewMessageUpdate = UpdateMap[UpdateTypeEnum.NewMessage];
 type RemovedMessageUpdate = UpdateMap[UpdateTypeEnum.RemovedMessage];
 type StartedBotUpdate = UpdateMap[UpdateTypeEnum.StartedBot];
@@ -84,7 +85,8 @@ type CustomContextTypes =
   | ForwardedFromUpdate
   | LiveLocationUpdate
   | LocationUpdate
-  | PollUpdate;
+  | PollUpdate
+  | StickerUpdate;
 
 export type {
   BaseUpdate,
@@ -99,6 +101,7 @@ export type {
   PollUpdate,
   RemovedMessageUpdate,
   StartedBotUpdate,
+  StickerUpdate,
   StoppedBotUpdate,
   Update,
   UpdateMap,

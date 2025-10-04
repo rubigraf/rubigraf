@@ -23,6 +23,7 @@ import type {
   LiveLocationUpdate,
   LocationUpdate,
   PollUpdate,
+  StickerUpdate,
 } from "../types";
 import { compose } from "./middleware";
 import { RubigrafEvents } from "../symbols";
@@ -497,6 +498,10 @@ class Rubigraf extends Event {
 
         if (update.new_message.poll) {
           await this.emitAsync(RubigrafEvents.Poll, ctx as Context<PollUpdate>, next);
+        }
+
+        if (update.new_message.sticker) {
+          await this.emitAsync(RubigrafEvents.Sticker, ctx as Context<StickerUpdate>, next);
         }
 
         await this.emitAsync(RubigrafEvents.NewMessage, ctx as Context<NewMessageUpdate>, next);

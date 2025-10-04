@@ -10,6 +10,7 @@ import {
   PollContext,
   RemovedMessageContext,
   StartedBotContext,
+  StickerContext,
   StoppedBotContext,
   UpdatedMessageContext,
   UpdatedPaymentContext,
@@ -25,6 +26,7 @@ import type {
   PollUpdate,
   RemovedMessageUpdate,
   StartedBotUpdate,
+  StickerUpdate,
   StoppedBotUpdate,
   Update,
   UpdatedMessageUpdate,
@@ -47,6 +49,8 @@ type Context<T extends Update = Update> = T extends CommandUpdate
   ? LocationContext
   : T extends PollUpdate
   ? PollContext
+  : T extends StickerUpdate
+  ? StickerContext
   : T extends NewMessageUpdate
   ? NewMessageContext
   : T extends RemovedMessageUpdate
