@@ -8,6 +8,7 @@ import type {
   LocationUpdate,
   NewMessageUpdate,
   Next,
+  PollUpdate,
   RemovedMessageUpdate,
   StartedBotUpdate,
   StoppedBotUpdate,
@@ -24,6 +25,7 @@ namespace RubigrafEvents {
   export const LiveLocation = Symbol("live_location");
   export const Location = Symbol("location");
   export const NewMessage = Symbol("new_message");
+  export const Poll = Symbol("poll");
   export const RemovedMessage = Symbol("removed_message");
   export const StartedBot = Symbol("started_bot");
   export const StoppedBot = Symbol("stopped_bot");
@@ -40,6 +42,7 @@ namespace RubigrafEvents {
     [LiveLocation]: [ctx: Context<LiveLocationUpdate>, next: Next];
     [Location]: [ctx: Context<LocationUpdate>, next: Next];
     [NewMessage]: [ctx: Context<NewMessageUpdate>, next: Next];
+    [Poll]: [ctx: Context<PollUpdate>, next: Next];
     [RemovedMessage]: [ctx: Context<RemovedMessageUpdate>, next: Next];
     [StartedBot]: [ctx: Context<StartedBotUpdate>, next: Next];
     [StoppedBot]: [ctx: Context<StoppedBotUpdate>, next: Next];

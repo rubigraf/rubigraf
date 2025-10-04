@@ -22,6 +22,7 @@ import type {
   ForwardedFromUpdate,
   LiveLocationUpdate,
   LocationUpdate,
+  PollUpdate,
 } from "../types";
 import { compose } from "./middleware";
 import { RubigrafEvents } from "../symbols";
@@ -492,6 +493,10 @@ class Rubigraf extends Event {
 
         if (update.new_message.location) {
           await this.emitAsync(RubigrafEvents.Location, ctx as Context<LocationUpdate>, next);
+        }
+
+        if (update.new_message.poll) {
+          await this.emitAsync(RubigrafEvents.Poll, ctx as Context<PollUpdate>, next);
         }
 
         await this.emitAsync(RubigrafEvents.NewMessage, ctx as Context<NewMessageUpdate>, next);

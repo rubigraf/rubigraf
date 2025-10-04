@@ -7,6 +7,7 @@ import {
   LiveLocationContext,
   LocationContext,
   NewMessageContext,
+  PollContext,
   RemovedMessageContext,
   StartedBotContext,
   StoppedBotContext,
@@ -21,6 +22,7 @@ import type {
   LiveLocationUpdate,
   LocationUpdate,
   NewMessageUpdate,
+  PollUpdate,
   RemovedMessageUpdate,
   StartedBotUpdate,
   StoppedBotUpdate,
@@ -41,6 +43,10 @@ type Context<T extends Update = Update> = T extends CommandUpdate
   ? LiveLocationContext
   : T extends LocationUpdate
   ? LocationContext
+  : T extends LocationUpdate
+  ? LocationContext
+  : T extends PollUpdate
+  ? PollContext
   : T extends NewMessageUpdate
   ? NewMessageContext
   : T extends RemovedMessageUpdate
