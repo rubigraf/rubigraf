@@ -19,6 +19,7 @@ import type {
   BotCommand,
   ContactUpdate,
   FileUpdate,
+  ForwardedFromUpdate,
 } from "../types";
 import { compose } from "./middleware";
 import { RubigrafEvents } from "../symbols";
@@ -469,6 +470,14 @@ class Rubigraf extends Event {
 
         if (update.new_message.file) {
           await this.emitAsync(RubigrafEvents.File, ctx as Context<FileUpdate>, next);
+        }
+
+        if (update.new_message.forwarded_from) {
+          await this.emitAsync(
+            RubigrafEvents.ForwardedFrom,
+            ctx as Context<ForwardedFromUpdate>,
+            next
+          );
         }
 
         await this.emitAsync(RubigrafEvents.NewMessage, ctx as Context<NewMessageUpdate>, next);
