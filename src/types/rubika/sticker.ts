@@ -1,3 +1,5 @@
+import { File } from "./file";
+
 /**
  * Represents a sticker attached to a message.
  *
