@@ -4,3 +4,4 @@ export * from "./contact";
 export * from "./file";
 export * from "./forwardedFrom";
 export * from "./liveLocation";
+export * from "./location";

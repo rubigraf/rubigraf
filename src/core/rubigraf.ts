@@ -21,6 +21,7 @@ import type {
   FileUpdate,
   ForwardedFromUpdate,
   LiveLocationUpdate,
+  LocationUpdate,
 } from "../types";
 import { compose } from "./middleware";
 import { RubigrafEvents } from "../symbols";
@@ -487,6 +488,10 @@ class Rubigraf extends Event {
             ctx as Context<LiveLocationUpdate>,
             next
           );
+        }
+
+        if (update.new_message.location) {
+          await this.emitAsync(RubigrafEvents.Location, ctx as Context<LocationUpdate>, next);
         }
 
         await this.emitAsync(RubigrafEvents.NewMessage, ctx as Context<NewMessageUpdate>, next);
