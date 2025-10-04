@@ -4,6 +4,7 @@ import type {
   Context,
   FileUpdate,
   ForwardedFromUpdate,
+  LiveLocationUpdate,
   NewMessageUpdate,
   Next,
   RemovedMessageUpdate,
@@ -19,6 +20,7 @@ namespace RubigrafEvents {
   export const Error = Symbol("error");
   export const File = Symbol("file");
   export const ForwardedFrom = Symbol("forwarded_from");
+  export const LiveLocation = Symbol("live_location");
   export const NewMessage = Symbol("new_message");
   export const RemovedMessage = Symbol("removed_message");
   export const StartedBot = Symbol("started_bot");
@@ -33,6 +35,7 @@ namespace RubigrafEvents {
     [Error]: [err: Error | string | unknown, next: Next];
     [File]: [ctx: Context<FileUpdate>, next: Next];
     [ForwardedFrom]: [ctx: Context<ForwardedFromUpdate>, next: Next];
+    [LiveLocation]: [ctx: Context<LiveLocationUpdate>, next: Next];
     [NewMessage]: [ctx: Context<NewMessageUpdate>, next: Next];
     [RemovedMessage]: [ctx: Context<RemovedMessageUpdate>, next: Next];
     [StartedBot]: [ctx: Context<StartedBotUpdate>, next: Next];

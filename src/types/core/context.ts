@@ -4,6 +4,7 @@ import {
   ContactContext,
   FileContext,
   ForwardedFromContext,
+  LiveLocationContext,
   NewMessageContext,
   RemovedMessageContext,
   StartedBotContext,
@@ -16,6 +17,7 @@ import type {
   ContactUpdate,
   FileUpdate,
   ForwardedFromUpdate,
+  LiveLocationUpdate,
   NewMessageUpdate,
   RemovedMessageUpdate,
   StartedBotUpdate,
@@ -33,6 +35,8 @@ type Context<T extends Update = Update> = T extends CommandUpdate
   ? FileContext
   : T extends ForwardedFromUpdate
   ? ForwardedFromContext
+  : T extends LiveLocationUpdate
+  ? LiveLocationContext
   : T extends NewMessageUpdate
   ? NewMessageContext
   : T extends RemovedMessageUpdate

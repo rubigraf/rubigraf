@@ -10,11 +10,12 @@ import {
   BaseContext,
   FileContext,
   ForwardedFromContext,
+  LiveLocationContext,
 } from "../core/contexts";
 import Rubigraf from "../core/rubigraf";
 import { UpdateTypeEnum } from "../enums";
 import { isCommand } from "../helper";
-import { Update, CommandUpdate, ContactUpdate, Context, FileUpdate, ForwardedFromUpdate } from "../types";
+import { Update, CommandUpdate, ContactUpdate, Context, FileUpdate, ForwardedFromUpdate, LiveLocationUpdate } from "../types";
 
 /**
  * Creates a new context based on {@link U Update}'s type.
@@ -40,6 +41,10 @@ function createContext<U extends Update>(update: U, bot: Rubigraf): Context<U> {
 
       if (update.new_message.forwarded_from) {
         return new ForwardedFromContext(update as ForwardedFromUpdate, bot) as Context<U>;
+      }
+
+      if (update.new_message.live_location) {
+        return new LiveLocationContext(update as LiveLocationUpdate, bot) as Context<U>;
       }
 
       return new NewMessageContext(update, bot) as Context<U>;

@@ -3,3 +3,4 @@ export * from "./command";
 export * from "./contact";
 export * from "./file";
 export * from "./forwardedFrom";
+export * from "./liveLocation";
