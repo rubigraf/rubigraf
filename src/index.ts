@@ -10,4 +10,5 @@ export * from "./hooks";
 export * from "./symbols";
 export * from "./types";
 
+export { Rubigraf };
 export default Rubigraf;
