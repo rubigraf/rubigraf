@@ -1,0 +1,15 @@
+# Ignore everything except dist and essential metadata
+
+src/
+tests/
+coverage/
+docs/
+node_modules/
+*.ts
+*.log
+*.tgz
+tsconfig.json
+
+# Allow dist
+!dist/
+!*.d.ts
