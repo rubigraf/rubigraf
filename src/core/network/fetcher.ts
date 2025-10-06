@@ -70,7 +70,7 @@ class FetchEngine {
             this.lastUpdateTime = Math.max(this.lastUpdateTime, time);
           }
 
-          await this.onUpdate(u);
+          this.onUpdate(u).catch((err) => this.onError(err));
         }
 
         this.offset_id = updates.next_offset_id || this.offset_id;
