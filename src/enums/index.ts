@@ -5,6 +5,7 @@ export * from "./buttonSelectionSearch";
 export * from "./buttonSelectionType";
 export * from "./buttonTextboxTypeKeypad";
 export * from "./buttonTextboxTypeLine";
+export * from "./buttonType";
 export * from "./chatKeypadType";
 export * from "./chatType";
 export * from "./forwardedFrom";
