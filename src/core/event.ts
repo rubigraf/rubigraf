@@ -91,16 +91,14 @@ class Event extends EventEmitter {
   public async emitAsync<K extends keyof RubigrafEvents.Map>(
     event: K,
     ...args: RubigrafEvents.Map[K]
-  ): Promise<boolean> {
-    if (!(await this.callListeners(this.before.get(event), args))) return false;
-    if (!(await this.callListeners(new Set(this.listeners(event)), args))) return false;
+  ): Promise<void> {
+    if (!(await this.callListeners(this.before.get(event), args))) return;
+    if (!(await this.callListeners(new Set(this.listeners(event)), args))) return;
 
     for (const fn of this.after.get(event) ?? []) {
       const result: any = fn(...(args.slice(0) as DropLast<RubigrafEvents.Map[K]>));
       if (result instanceof Promise) await result;
     }
-
-    return true;
   }
 
   /**
@@ -165,7 +163,9 @@ class Event extends EventEmitter {
         this.off(event, l as any);
       }
     }
+    this.before.clear();
     this.installed.clear();
+    this.after.clear();
     return this;
   }
 

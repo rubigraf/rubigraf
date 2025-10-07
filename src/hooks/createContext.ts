@@ -14,11 +14,24 @@ import {
   LocationContext,
   PollContext,
   StickerContext,
+  QueryContext,
 } from "../core/contexts";
 import Rubigraf from "../core/rubigraf";
 import { UpdateTypeEnum } from "../enums";
 import { isCommand } from "../helper";
-import { Update, CommandUpdate, ContactUpdate, Context, FileUpdate, ForwardedFromUpdate, LiveLocationUpdate, LocationUpdate, PollUpdate, StickerUpdate } from "../types";
+import type {
+  Update,
+  CommandUpdate,
+  ContactUpdate,
+  Context,
+  FileUpdate,
+  ForwardedFromUpdate,
+  LiveLocationUpdate,
+  LocationUpdate,
+  PollUpdate,
+  StickerUpdate,
+  QueryUpdate,
+} from "../types";
 
 /**
  * Creates a new context based on {@link U Update}'s type.
@@ -30,36 +43,42 @@ import { Update, CommandUpdate, ContactUpdate, Context, FileUpdate, ForwardedFro
 function createContext<U extends Update>(update: U, bot: Rubigraf): Context<U> {
   switch (update.type) {
     case UpdateTypeEnum.NewMessage:
-      if (isCommand(update.new_message.text || "")) {
+      const m = update.new_message;
+
+      if (isCommand(m.text || "")) {
         return new CommandContext(update as CommandUpdate, bot) as Context<U>;
       }
 
-      if (update.new_message.contact_message) {
+      if (m.contact_message) {
         return new ContactContext(update as ContactUpdate, bot) as Context<U>;
       }
 
-      if (update.new_message.file) {
+      if (m.file) {
         return new FileContext(update as FileUpdate, bot) as Context<U>;
       }
 
-      if (update.new_message.forwarded_from) {
+      if (m.forwarded_from) {
         return new ForwardedFromContext(update as ForwardedFromUpdate, bot) as Context<U>;
       }
 
-      if (update.new_message.live_location) {
+      if (m.live_location) {
         return new LiveLocationContext(update as LiveLocationUpdate, bot) as Context<U>;
       }
 
-      if (update.new_message.location) {
+      if (m.location) {
         return new LocationContext(update as LocationUpdate, bot) as Context<U>;
       }
 
-      if (update.new_message.poll) {
+      if (m.poll) {
         return new PollContext(update as PollUpdate, bot) as Context<U>;
       }
 
-      if (update.new_message.sticker) {
+      if (m.sticker) {
         return new StickerContext(update as StickerUpdate, bot) as Context<U>;
+      }
+
+      if (m.aux_data) {
+        return new QueryContext(update as QueryUpdate, bot) as Context<U>;
       }
 
       return new NewMessageContext(update, bot) as Context<U>;

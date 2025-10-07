@@ -24,6 +24,7 @@ import type {
   LocationUpdate,
   PollUpdate,
   StickerUpdate,
+  QueryUpdate,
 } from "../types";
 import { compose } from "./middleware";
 import { RubigrafEvents } from "../symbols";
@@ -458,92 +459,82 @@ class Rubigraf extends Event {
    * @since v1.0.0
    */
   async handleUpdate<U extends Update>(update: U) {
-    const ctx = createContext(update, this);
-    await this.composed(ctx as Context<U>, async () => {});
+    try {
+      const ctx = <T extends Update>(): Context<T> =>
+        createContext<T>(update as unknown as T, this);
+      await this.composed(ctx<U>(), async () => {});
 
-    switch (update.type) {
-      case UpdateTypeEnum.NewMessage:
-        const m = update.new_message;
-        if (isCommand(m.text || "")) {
-          await this.emitAsync(RubigrafEvents.Command, ctx as Context<CommandUpdate>, next);
-        }
+      switch (update.type) {
+        case UpdateTypeEnum.NewMessage:
+          const m = update.new_message;
 
-        if (update.new_message.contact_message) {
-          await this.emitAsync(RubigrafEvents.Contact, ctx as Context<ContactUpdate>, next);
-        }
+          if (isCommand(m.text || "")) {
+            await this.emitAsync(RubigrafEvents.Command, ctx<CommandUpdate>(), next);
+          }
 
-        if (update.new_message.file) {
-          await this.emitAsync(RubigrafEvents.File, ctx as Context<FileUpdate>, next);
-        }
+          if (m.contact_message) {
+            await this.emitAsync(RubigrafEvents.Contact, ctx<ContactUpdate>(), next);
+          }
 
-        if (update.new_message.forwarded_from) {
-          await this.emitAsync(
-            RubigrafEvents.ForwardedFrom,
-            ctx as Context<ForwardedFromUpdate>,
-            next
-          );
-        }
+          if (m.file) {
+            await this.emitAsync(RubigrafEvents.File, ctx<FileUpdate>(), next);
+          }
 
-        if (update.new_message.live_location) {
-          await this.emitAsync(
-            RubigrafEvents.LiveLocation,
-            ctx as Context<LiveLocationUpdate>,
-            next
-          );
-        }
+          if (m.forwarded_from) {
+            await this.emitAsync(RubigrafEvents.ForwardedFrom, ctx<ForwardedFromUpdate>(), next);
+          }
 
-        if (update.new_message.location) {
-          await this.emitAsync(RubigrafEvents.Location, ctx as Context<LocationUpdate>, next);
-        }
+          if (m.live_location) {
+            await this.emitAsync(RubigrafEvents.LiveLocation, ctx<LiveLocationUpdate>(), next);
+          }
 
-        if (update.new_message.poll) {
-          await this.emitAsync(RubigrafEvents.Poll, ctx as Context<PollUpdate>, next);
-        }
+          if (m.location) {
+            await this.emitAsync(RubigrafEvents.Location, ctx<LocationUpdate>(), next);
+          }
 
-        if (update.new_message.sticker) {
-          await this.emitAsync(RubigrafEvents.Sticker, ctx as Context<StickerUpdate>, next);
-        }
+          if (m.poll) {
+            await this.emitAsync(RubigrafEvents.Poll, ctx<PollUpdate>(), next);
+          }
 
-        await this.emitAsync(RubigrafEvents.NewMessage, ctx as Context<NewMessageUpdate>, next);
-        break;
+          if (m.sticker) {
+            await this.emitAsync(RubigrafEvents.Sticker, ctx<StickerUpdate>(), next);
+          }
 
-      case UpdateTypeEnum.RemovedMessage:
-        await this.emitAsync(
-          RubigrafEvents.RemovedMessage,
-          ctx as Context<RemovedMessageUpdate>,
-          next
-        );
-        break;
+          if (m.aux_data) {
+            await this.emitAsync(RubigrafEvents.Query, ctx<QueryUpdate>(), next);
+          }
 
-      case UpdateTypeEnum.StartedBot:
-        await this.emitAsync(RubigrafEvents.StartedBot, ctx as Context<StartedBotUpdate>, next);
-        break;
+          await this.emitAsync(RubigrafEvents.NewMessage, ctx<NewMessageUpdate>(), next);
+          break;
 
-      case UpdateTypeEnum.StoppedBot:
-        await this.emitAsync(RubigrafEvents.StoppedBot, ctx as Context<StoppedBotUpdate>, next);
-        break;
+        case UpdateTypeEnum.RemovedMessage:
+          await this.emitAsync(RubigrafEvents.RemovedMessage, ctx<RemovedMessageUpdate>(), next);
+          break;
 
-      case UpdateTypeEnum.UpdatedMessage:
-        await this.emitAsync(
-          RubigrafEvents.UpdatedMessage,
-          ctx as Context<UpdatedMessageUpdate>,
-          next
-        );
-        break;
+        case UpdateTypeEnum.StartedBot:
+          await this.emitAsync(RubigrafEvents.StartedBot, ctx<StartedBotUpdate>(), next);
+          break;
 
-      case UpdateTypeEnum.UpdatedPayment:
-        await this.emitAsync(
-          RubigrafEvents.UpdatedPayment,
-          ctx as Context<UpdatedPaymentUpdate>,
-          next
-        );
-        break;
+        case UpdateTypeEnum.StoppedBot:
+          await this.emitAsync(RubigrafEvents.StoppedBot, ctx<StoppedBotUpdate>(), next);
+          break;
 
-      default:
-        break;
+        case UpdateTypeEnum.UpdatedMessage:
+          await this.emitAsync(RubigrafEvents.UpdatedMessage, ctx<UpdatedMessageUpdate>(), next);
+          break;
+
+        case UpdateTypeEnum.UpdatedPayment:
+          await this.emitAsync(RubigrafEvents.UpdatedPayment, ctx<UpdatedPaymentUpdate>(), next);
+          break;
+
+        default:
+          break;
+      }
+
+      await this.emitAsync(RubigrafEvents.Update, ctx<U>(), next);
+    } catch (err) {
+      await this.emitAsync(RubigrafEvents.Error, err, next);
     }
-
-    await this.emitAsync(RubigrafEvents.Update, ctx as Context<U>, next);
   }
 
   /**
@@ -552,7 +543,19 @@ class Rubigraf extends Event {
    * @since v1.0.0
    */
   async launch() {
-    await this.engine.start();
+    try {
+      await this.engine.start();
+
+      process.on("unhandledRejection", async (reason) => {
+        await this.emitAsync(RubigrafEvents.Error, reason, next);
+      });
+
+      process.on("uncaughtException", async (err) => {
+        await this.emitAsync(RubigrafEvents.Error, err, next);
+      });
+    } catch (err) {
+      await this.emitAsync(RubigrafEvents.Error, err, next);
+    }
   }
 
   /**
@@ -561,6 +564,7 @@ class Rubigraf extends Event {
    * @since v1.0.0
    */
   stop() {
+    this.uninstallAll();
     this.engine.stop();
   }
 }

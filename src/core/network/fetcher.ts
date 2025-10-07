@@ -12,7 +12,7 @@ class FetchEngine {
     private http: HTTPClient,
     private opts: Required<Pick<RubigrafOptions, "freshnessWindow" | "pollIntervalMs">>,
     private onUpdate: (update: Update) => Promise<void>,
-    private onError: (err: unknown) => Promise<boolean>
+    private onError: (err: unknown) => Promise<void>
   ) {}
 
   /**

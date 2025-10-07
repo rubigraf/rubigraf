@@ -6,4 +6,5 @@ export * from "./forwardedFrom";
 export * from "./liveLocation";
 export * from "./location";
 export * from "./poll";
+export * from "./query";
 export * from "./sticker";
