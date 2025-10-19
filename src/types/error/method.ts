@@ -12,6 +12,8 @@ type Methods =
   | "deleteMessage"
   | "setCommands"
   | "updateBotEndpoints"
-  | "editChatKeypad";
+  | "editChatKeypad"
+  | "getFile"
+  | "sendFile";
 
 export type { Methods };

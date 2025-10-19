@@ -8,6 +8,7 @@ export * from "./buttonTextboxTypeLine";
 export * from "./buttonType";
 export * from "./chatKeypadType";
 export * from "./chatType";
+export * from "./fileType";
 export * from "./forwardedFrom";
 export * from "./liveLocationStatus";
 export * from "./messageSender";

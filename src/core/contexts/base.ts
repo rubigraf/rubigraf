@@ -1,5 +1,5 @@
 import { ChatKeypadTypeEnum, UpdateEndpointTypeEnum } from "../../enums";
-import type { BotCommand, Keypad, Update } from "../../types";
+import type { BotCommand, Keypad, SendMessageOptions, Update } from "../../types";
 import Rubigraf from "../rubigraf";
 
 /**
@@ -39,15 +39,11 @@ class BaseContext<T extends Update = Update> {
    * Send a reply to the current chat.
    *
    * @param text Text message to send
-   * @param replyTo The message ID to reply to
-   * @param disableNotification Whether notification should be disabled or not
+   * @param opts The {@link SendMessageOptions Options} to reply
    * @since v1.0.0
    */
-  reply(text: string, replyTo?: string, disableNotification?: boolean) {
-    return this.bot.sendMessage(this.chatId, text, {
-      replyToMessageId: replyTo,
-      disableNotification,
-    });
+  reply(text: string, opts?: SendMessageOptions) {
+    return this.bot.sendMessage(this.chatId, text, opts);
   }
 
   /**
@@ -64,20 +60,11 @@ class BaseContext<T extends Update = Update> {
    *
    * @param question Question text content
    * @param options Poll's options
-   * @param replyTo The message ID to reply to
-   * @param disableNotification Whether notification should be disabled or not
+   * @param opts The {@link SendMessageOptions Options} to send poll
    * @since v1.0.0
    */
-  public async sendPoll(
-    question: string,
-    options: string[],
-    replyTo?: string,
-    disableNotification?: boolean
-  ) {
-    return await this.bot.sendPoll(this.chatId, question, options, {
-      replyToMessageId: replyTo,
-      disableNotification,
-    });
+  public async sendPoll(question: string, options: string[], opts?: SendMessageOptions) {
+    return await this.bot.sendPoll(this.chatId, question, options, opts);
   }
 
   /**
@@ -85,20 +72,11 @@ class BaseContext<T extends Update = Update> {
    *
    * @param latitude Latitude of the location
    * @param longitude Longitude of the location
-   * @param replyTo The message ID to reply to
-   * @param disableNotification Whether notification should be disabled or not
+   * @param opts The {@link SendMessageOptions Options} to send location
    * @since v1.0.0
    */
-  public async sendLocation(
-    latitude: string,
-    longitude: string,
-    replyTo?: string,
-    disableNotification?: boolean
-  ) {
-    return await this.bot.sendLocation(this.chatId, latitude, longitude, {
-      replyToMessageId: replyTo,
-      disableNotification,
-    });
+  public async sendLocation(latitude: string, longitude: string, opts?: SendMessageOptions) {
+    return await this.bot.sendLocation(this.chatId, latitude, longitude, opts);
   }
 
   /**
@@ -238,6 +216,32 @@ class BaseContext<T extends Update = Update> {
    */
   public async clearChatKeypad(chatId: string): Promise<void> {
     await this.bot.editChatKeypad(chatId, ChatKeypadTypeEnum.Remove);
+  }
+
+  /**
+   * Gets file's download url.
+   *
+   * @param fileId Target file ID
+   *
+   * @since v1.2.0
+   */
+  public async getFile(fileId: string): Promise<string> {
+    return await this.bot.getFile(fileId);
+  }
+
+  /**
+   * Uploads a file.
+   *
+   * @param chatId Target chat ID
+   * @param file Target {@link File}
+   * @param opts The {@link SendMessageOptions Options} to send file
+   * @param text Optionally text to send with the file
+   * @returns The message ID
+   *
+   * @since v1.2.0
+   */
+  public async sendFile(chatId: string, file: File, opts?: SendMessageOptions, text?: string) {
+    return await this.bot.sendFile(chatId, file, text, opts);
   }
 }
 

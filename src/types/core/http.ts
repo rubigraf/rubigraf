@@ -15,6 +15,7 @@ type HTTPMethod = "GET" | "POST" | "PUT" | "DELETE";
 interface HTTPClientOptions {
   baseURL: string;
   token: string;
+  onError: (error: unknown) => Promise<void>;
   headers?: Record<string, string>;
   timeoutMs?: number;
 }

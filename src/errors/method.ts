@@ -1,4 +1,4 @@
-import { APIStatus, Methods } from "../types";
+import type { APIStatus, Methods } from "../types";
 
 class MethodError extends Error {
   constructor(method: Methods, status: APIStatus) {

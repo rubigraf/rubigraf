@@ -28,12 +28,13 @@ import type {
 } from "../types";
 import { compose } from "./middleware";
 import { RubigrafEvents } from "../symbols";
-import { ChatKeypadTypeEnum, UpdateEndpointTypeEnum, UpdateTypeEnum } from "../enums";
+import { ChatKeypadTypeEnum, FileTypeEnum, UpdateEndpointTypeEnum, UpdateTypeEnum } from "../enums";
 import { Context } from "../types";
 import { createContext } from "../hooks";
-import { isCommand, next } from "../helper";
+import { getFileType, isCommand, next } from "../helper";
 import { EditChatKeypadError, MethodError, PollLengthError } from "../errors";
 import { FetchEngine, HTTPClient } from "./network";
+import FormData from "form-data";
 
 const DEFAULT_OPTS: Required<RubigrafOptions> = {
   baseURL: "https://botapi.rubika.ir/v3/",
@@ -66,7 +67,11 @@ class Rubigraf extends Event {
   constructor(private token: string, private opts: RubigrafOptions = {}) {
     super();
     this.opts = { ...DEFAULT_OPTS, ...opts };
-    this.http = new HTTPClient({ baseURL: this.opts.baseURL!, token });
+    this.http = new HTTPClient({
+      baseURL: this.opts.baseURL!,
+      token,
+      onError: async (err) => await this.emitError(err),
+    });
     this.engine = new FetchEngine(
       this.http,
       {
@@ -74,7 +79,7 @@ class Rubigraf extends Event {
         pollIntervalMs: opts.pollIntervalMs || DEFAULT_OPTS.pollIntervalMs,
       },
       this.handleUpdate.bind(this),
-      async (err) => await this.emitAsync(RubigrafEvents.Error, err, next)
+      async (err) => await this.emitError(err)
     );
     this.composed = compose(this.middlewares);
   }
@@ -452,6 +457,95 @@ class Rubigraf extends Event {
   }
 
   /**
+   * Gets file's download url.
+   *
+   * @param fileId Target file ID
+   *
+   * @since v1.2.0
+   */
+  async getFile(fileId: string): Promise<string> {
+    const res = await this.http.request<APIResponse<{ download_url: string }>>("POST", "getFile", {
+      file_id: fileId,
+    });
+
+    if (res.status !== "OK") throw new MethodError("getFile", res.status);
+
+    return res.data.download_url;
+  }
+
+  /**
+   * Uploads a file.
+   *
+   * @param chatId Target chat ID
+   * @param file The file to send
+   * @param text Optionally text with the file
+   * @param opts Options to send alongside with file
+   *
+   * @since v1.2.0
+   */
+  async sendFile(
+    chatId: string,
+    file: File,
+    text?: string,
+    opts?: SendMessageOptions
+  ): Promise<Message["message_id"] | null> {
+    const type = getFileType(file.type as any);
+    const { file_id, status } = await this.requestSendFile(file, type);
+
+    if (status) return null;
+
+    const payload = this.fillSendMessagePayload(
+      {
+        chat_id: chatId,
+        file_id,
+        text,
+      },
+      opts
+    );
+
+    const res = await this.http.request<APIResponse<Pick<Message, "message_id">>>(
+      "POST",
+      "sendFile",
+      payload
+    );
+
+    if (res.status !== "OK") throw new MethodError("sendFile", res.status);
+
+    return res.data.message_id;
+  }
+
+  /**
+   * @param file The file
+   * @returns The `file_id`
+   *
+   * @since v1.2.0
+   */
+  private async requestSendFile(file: File, type: FileTypeEnum) {
+    const formData = new FormData({ autoDestroy: true });
+    const filename = file.name;
+    const contentType = file.type;
+
+    try {
+      const hasArrayBuffer = typeof file.arrayBuffer === "function";
+      if (hasArrayBuffer) {
+        const buf = Buffer.from(await file.arrayBuffer());
+        formData.append("file", buf, { filename, contentType });
+      } else {
+        formData.append("file", file, { filename, contentType });
+      }
+    } catch (err) {
+      formData.append("file", file, { filename, contentType });
+      await this.emitError(err);
+    }
+
+    return await this.http.upload(formData, type);
+  }
+
+  private async emitError(error: unknown) {
+    await this.emitAsync(RubigrafEvents.Error, error, next);
+  }
+
+  /**
    * Handle a single update.
    *
    * @param update Update payload from API
@@ -533,7 +627,7 @@ class Rubigraf extends Event {
 
       await this.emitAsync(RubigrafEvents.Update, ctx<U>(), next);
     } catch (err) {
-      await this.emitAsync(RubigrafEvents.Error, err, next);
+      await this.emitError(err);
     }
   }
 
@@ -547,14 +641,14 @@ class Rubigraf extends Event {
       await this.engine.start();
 
       process.on("unhandledRejection", async (reason) => {
-        await this.emitAsync(RubigrafEvents.Error, reason, next);
+        await this.emitError(reason);
       });
 
       process.on("uncaughtException", async (err) => {
-        await this.emitAsync(RubigrafEvents.Error, err, next);
+        await this.emitError(err);
       });
     } catch (err) {
-      await this.emitAsync(RubigrafEvents.Error, err, next);
+      await this.emitError(err);
     }
   }
 

@@ -4,7 +4,6 @@ src/
 tests/
 coverage/
 docs/
-node_modules/
 *.ts
 *.log
 *.tgz
@@ -13,3 +12,6 @@ tsconfig.json
 # Allow dist
 !dist/
 !*.d.ts
+
+# Allow node_modules from v1.2.0 because of form-data npm module
+!node_modules/

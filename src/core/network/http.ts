@@ -1,4 +1,7 @@
-import type { HTTPClientOptions, HTTPMethod } from "../../types";
+import FormData from "form-data";
+import { FileTypeEnum } from "../../enums";
+import type { APIResponse, File, HTTPClientOptions, HTTPMethod, UploadResult } from "../../types";
+import { UploadFileIDError } from "../../errors";
 
 /**
  * Minimal HTTP client using global fetch (Node 18+).
@@ -61,8 +64,97 @@ class HTTPClient {
       }
 
       return (await res.json()) as T;
+    } catch (err) {
+      await this.opts.onError(err);
+      return { status: "SERVER_ERROR" } as T;
     } finally {
       clearTimeout(timeout);
+    }
+  }
+
+  /**
+   * Sends a request to Rubika APIs to upload a file
+   *
+   * @param formData The {@link FormData}
+   * @param type {@link FileTypeEnum Type} of the file
+   * @returns The upload result
+   *
+   * @since v1.2.0
+   */
+  async upload(formData: FormData, type: FileTypeEnum): Promise<UploadResult> {
+    try {
+      const req = await this.request<APIResponse<{ upload_url: string }>>(
+        "POST",
+        "requestSendFile",
+        { type }
+      );
+
+      const headers = formData.getHeaders();
+
+      try {
+        const len: number = await new Promise((resolve, reject) => {
+          formData.getLength((err: any, length: number) => {
+            if (err) return reject(err);
+            resolve(length);
+          });
+        });
+        if (len && typeof len === "number") {
+          headers["Content-Length"] = String(len);
+        }
+      } catch (err) {
+        this.opts.onError("could not compute form-data length: " + err);
+      }
+
+      let res: Response;
+
+      if (typeof formData.getBuffer === "function") {
+        try {
+          const buffer: Buffer = formData.getBuffer();
+          headers["Content-Length"] = String(buffer.length);
+          res = await fetch(req.data.upload_url, {
+            method: "POST",
+            body: buffer as any,
+            headers,
+          });
+        } catch (err) {
+          this.opts.onError(err);
+          res = await fetch(req.data.upload_url, {
+            method: "POST",
+            body: formData as any,
+            headers,
+          });
+        }
+      } else {
+        res = await fetch(req.data.upload_url, {
+          method: "POST",
+          body: formData as any,
+          headers,
+        });
+      }
+
+      try {
+        formData.destroy?.();
+      } catch (_) {}
+
+      if (!res.ok) {
+        const text = await res.text().catch(() => "");
+        throw new Error(`upload failed: ${res.status} ${res.statusText} - ${text}`);
+      }
+
+      const json = await res.json().catch(async (err) => {
+        const txt = await res.text().catch(() => "<no-body>");
+        throw new Error(`failed to parse upload response json: ${err} - body: ${txt}`);
+      });
+
+      const fileId = json.data.file_id;
+      if (!fileId) {
+        throw new UploadFileIDError();
+      }
+
+      return { file_id: fileId };
+    } catch (err) {
+      await this.opts.onError(err);
+      return { status: "SERVER_ERROR" };
     }
   }
 }
