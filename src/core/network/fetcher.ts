@@ -1,5 +1,10 @@
 import { MethodError } from "../../errors";
-import { APIResponse, GetUpdatesResponse, RubigrafOptions, Update } from "../../types";
+import type {
+  APIResponse,
+  FetchEngineOptions,
+  GetUpdatesResponse,
+  Update,
+} from "../../types";
 import HTTPClient from "./http";
 
 class FetchEngine {
@@ -10,7 +15,7 @@ class FetchEngine {
 
   constructor(
     private http: HTTPClient,
-    private opts: Required<Pick<RubigrafOptions, "freshnessWindow" | "pollIntervalMs">>,
+    private opts: FetchEngineOptions,
     private onUpdate: (update: Update) => Promise<void>,
     private onError: (err: unknown) => Promise<void>
   ) {}
@@ -42,7 +47,7 @@ class FetchEngine {
   }
 
   /**
-   * Start the long-polling loop.
+   * Start the long-polling loop or webhook configurations.
    *
    * @since v1.0.0
    */

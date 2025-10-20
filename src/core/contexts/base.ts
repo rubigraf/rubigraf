@@ -188,11 +188,12 @@ class BaseContext<T extends Update = Update> {
    *
    * @param url The url of the webhook
    * @param type The type of the webhook
+   * @deprecated No more useful as of v1.2.5!
    *
    * @since v1.0.0
    */
   public async setWebhook(url: string, type: UpdateEndpointTypeEnum): Promise<void> {
-    await this.bot.setWebhook(url, type);
+    // await this.bot.setWebhook(url, type);
   }
 
   /**

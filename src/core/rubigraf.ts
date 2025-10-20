@@ -25,6 +25,7 @@ import type {
   PollUpdate,
   StickerUpdate,
   QueryUpdate,
+  WebhookAPIStatus,
 } from "../types";
 import { compose } from "./middleware";
 import { RubigrafEvents } from "../symbols";
@@ -32,14 +33,16 @@ import { ChatKeypadTypeEnum, FileTypeEnum, UpdateEndpointTypeEnum, UpdateTypeEnu
 import { Context } from "../types";
 import { createContext } from "../hooks";
 import { getFileType, isCommand, next } from "../helper";
-import { EditChatKeypadError, MethodError, PollLengthError } from "../errors";
+import { EditChatKeypadError, MethodError, PollLengthError, WebhookConfigError } from "../errors";
 import { FetchEngine, HTTPClient } from "./network";
 import FormData from "form-data";
 
-const DEFAULT_OPTS: Required<RubigrafOptions> = {
+const DEFAULT_OPTS: RubigrafOptions = {
   baseURL: "https://botapi.rubika.ir/v3/",
   freshnessWindow: 5,
-  pollIntervalMs: 2000,
+  polling: {
+    pollIntervalMs: 0,
+  },
 };
 
 /**
@@ -64,9 +67,18 @@ class Rubigraf extends Event {
    *
    * @since v1.0.0
    */
-  constructor(private token: string, private opts: RubigrafOptions = {}) {
+  constructor(private token: string, private opts: Partial<RubigrafOptions> = {}) {
     super();
-    this.opts = { ...DEFAULT_OPTS, ...opts };
+    this.opts = {
+      baseURL: opts.baseURL ?? DEFAULT_OPTS.baseURL,
+      freshnessWindow: opts.freshnessWindow ?? DEFAULT_OPTS.freshnessWindow,
+      polling: opts.webhook === undefined ? opts.polling ?? DEFAULT_OPTS.polling : undefined,
+      webhook: !opts.polling ? opts.webhook : undefined,
+    } as RubigrafOptions;
+    const pollIntervalMs =
+      typeof opts.polling !== "boolean" && opts.polling !== undefined
+        ? opts.polling.pollIntervalMs
+        : 0;
     this.http = new HTTPClient({
       baseURL: this.opts.baseURL!,
       token,
@@ -75,8 +87,8 @@ class Rubigraf extends Event {
     this.engine = new FetchEngine(
       this.http,
       {
-        freshnessWindow: opts.freshnessWindow || DEFAULT_OPTS.freshnessWindow,
-        pollIntervalMs: opts.pollIntervalMs || DEFAULT_OPTS.pollIntervalMs,
+        freshnessWindow: opts.freshnessWindow ?? DEFAULT_OPTS.freshnessWindow,
+        pollIntervalMs,
       },
       this.handleUpdate.bind(this),
       async (err) => await this.emitError(err)
@@ -417,13 +429,40 @@ class Rubigraf extends Event {
    *
    * @since v1.0.0
    */
-  async setWebhook(url: string, type: UpdateEndpointTypeEnum): Promise<void> {
-    const res = await this.http.request<APIResponse<null>>("POST", "updateBotEndpoints", {
-      url,
-      type,
-    });
+  private async setWebhook(url: string, type: UpdateEndpointTypeEnum): Promise<void> {
+    const maxRetries = 3;
+    const retryDelay = 2000;
 
-    if (res.status !== "OK") throw new MethodError("updateBotEndpoints", res.status);
+    const requestWebhook = async () => {
+      const res = await this.http.request<APIResponse<{ status: WebhookAPIStatus }>>(
+        "POST",
+        "updateBotEndpoints",
+        { url, type }
+      );
+
+      if (res.data.status !== "Done") {
+        throw new MethodError("updateBotEndpoints", res.data.status);
+      }
+    };
+
+    for (let attempt = 1; attempt <= maxRetries; attempt++) {
+      try {
+        await requestWebhook();
+        console.log(`Webhook successfully set on attempt ${attempt}.`);
+        return;
+      } catch (err) {
+        console.warn(`Webhook setup failed (attempt ${attempt}/${maxRetries});`, err);
+
+        if (attempt < maxRetries) {
+          const delay = retryDelay * attempt;
+          console.log(`Retrying in ${delay / 1000}s...`);
+          await new Promise((res) => setTimeout(res, delay));
+        } else {
+          console.error("Webhook setup failed after all retries.");
+          throw err; // Rethrow the last error
+        }
+      }
+    }
   }
 
   /**
@@ -632,13 +671,25 @@ class Rubigraf extends Event {
   }
 
   /**
-   * Start the long-polling loop.
+   * Start the long-polling loop or webhook configurations.
    *
    * @since v1.0.0
    */
   async launch() {
     try {
-      await this.engine.start();
+      if (this.opts.polling) {
+        await this.engine.start();
+      } else {
+        if (!this.opts.webhook) throw new WebhookConfigError();
+
+        await this.setWebhook(this.opts.webhook.url, this.opts.webhook.type);
+        console.log(
+          "[Rubigraf] Webhook successfully configured. " +
+            "Polling is disabled" +
+            " — " +
+            "use Rubigraf.handleUpdate(update) before using events to process incoming updates."
+        );
+      }
 
       process.on("unhandledRejection", async (reason) => {
         await this.emitError(reason);

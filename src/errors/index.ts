@@ -3,3 +3,4 @@ export * from "./method";
 export * from "./pollLength";
 export * from "./sendFile";
 export * from "./uploadFileId";
+export * from "./webhookConfig";
