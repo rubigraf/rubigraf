@@ -53,7 +53,7 @@ Below are a few examples demonstrating Rubigraf's event-based structure.
 ```js
 const { Rubigraf, RubigrafEvents } = require("rubigraf");
 
-const bot = new Rubigraf(process.env.BOT_TOKEN, { pollIntervalMs: 0 });
+const bot = new Rubigraf(process.env.BOT_TOKEN, { polling: true });
 
 bot.launch();
 
@@ -68,7 +68,7 @@ bot.on(RubigrafEvents.NewMessage, async (ctx, next) => {
 ```js
 const { Rubigraf, RubigrafEvents } = require("rubigraf");
 
-const bot = new Rubigraf(process.env.BOT_TOKEN, { pollIntervalMs: 0 });
+const bot = new Rubigraf(process.env.BOT_TOKEN, { polling: true });
 
 bot.launch();
 
