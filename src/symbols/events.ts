@@ -1,3 +1,4 @@
+import Logger from "../core/log/logger";
 import type {
   CommandUpdate,
   ContactUpdate,
@@ -40,7 +41,7 @@ namespace RubigrafEvents {
   export type Map = {
     [Command]: [ctx: Context<CommandUpdate>, next: Next];
     [Contact]: [ctx: Context<ContactUpdate>, next: Next];
-    [Error]: [err: Error | string | unknown, next: Next];
+    [Error]: [err: Error | string | unknown, logger: Logger, next: Next];
     [File]: [ctx: Context<FileUpdate>, next: Next];
     [ForwardedFrom]: [ctx: Context<ForwardedFromUpdate>, next: Next];
     [LiveLocation]: [ctx: Context<LiveLocationUpdate>, next: Next];

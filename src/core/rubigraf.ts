@@ -36,6 +36,7 @@ import { getFileType, isCommand, next } from "../helper";
 import { EditChatKeypadError, MethodError, PollLengthError, WebhookConfigError } from "../errors";
 import { FetchEngine, HTTPClient } from "./network";
 import FormData from "form-data";
+import Logger from "./log/logger";
 
 const DEFAULT_OPTS: RubigrafOptions = {
   baseURL: "https://botapi.rubika.ir/v3/",
@@ -56,6 +57,7 @@ const DEFAULT_OPTS: RubigrafOptions = {
 class Rubigraf extends Event {
   private http: HTTPClient;
   private engine: FetchEngine;
+  private logger: Logger;
   private middlewares: Middleware[] = [];
   private composed = compose([]);
 
@@ -72,6 +74,7 @@ class Rubigraf extends Event {
     this.opts = {
       baseURL: opts.baseURL ?? DEFAULT_OPTS.baseURL,
       freshnessWindow: opts.freshnessWindow ?? DEFAULT_OPTS.freshnessWindow,
+      logger: { ...DEFAULT_OPTS.logger, ...opts.logger },
       polling: opts.webhook === undefined ? opts.polling ?? DEFAULT_OPTS.polling : undefined,
       webhook: !opts.polling ? opts.webhook : undefined,
     } as RubigrafOptions;
@@ -84,12 +87,14 @@ class Rubigraf extends Event {
       token,
       onError: async (err) => await this.emitError(err),
     });
+    this.logger = new Logger({ ...this.opts.logger });
     this.engine = new FetchEngine(
       this.http,
       {
         freshnessWindow: opts.freshnessWindow ?? DEFAULT_OPTS.freshnessWindow,
         pollIntervalMs,
       },
+      this.logger.child("Engine"),
       this.handleUpdate.bind(this),
       async (err) => await this.emitError(err)
     );
@@ -448,18 +453,18 @@ class Rubigraf extends Event {
     for (let attempt = 1; attempt <= maxRetries; attempt++) {
       try {
         await requestWebhook();
-        console.log(`Webhook successfully set on attempt ${attempt}.`);
+        this.logger.debug(`Webhook successfully set on attempt ${attempt}.`);
         return;
       } catch (err) {
-        console.warn(`Webhook setup failed (attempt ${attempt}/${maxRetries});`, err);
+        this.logger.warn(`Webhook setup failed (attempt ${attempt}/${maxRetries});`, err);
 
         if (attempt < maxRetries) {
           const delay = retryDelay * attempt;
-          console.log(`Retrying in ${delay / 1000}s...`);
+          this.logger.debug(`Retrying in ${delay / 1000}s...`);
           await new Promise((res) => setTimeout(res, delay));
         } else {
-          console.error("Webhook setup failed after all retries.");
-          throw err; // Rethrow the last error
+          this.logger.error("Webhook setup failed after all retries.");
+          throw err;
         }
       }
     }
@@ -581,7 +586,7 @@ class Rubigraf extends Event {
   }
 
   private async emitError(error: unknown) {
-    await this.emitAsync(RubigrafEvents.Error, error, next);
+    await this.emitAsync(RubigrafEvents.Error, error, this.logger.child("ErrorEvent"), next);
   }
 
   /**
@@ -683,11 +688,9 @@ class Rubigraf extends Event {
         if (!this.opts.webhook) throw new WebhookConfigError();
 
         await this.setWebhook(this.opts.webhook.url, this.opts.webhook.type);
-        console.log(
-          "[Rubigraf] Webhook successfully configured. " +
-            "Polling is disabled" +
-            " — " +
-            "use Rubigraf.handleUpdate(update) before using events to process incoming updates."
+        this.logger.info("Webhook successfully configured.");
+        this.logger.warn(
+          "Polling is disabled, Please use Rubigraf.handleUpdate(update) before using events to process incoming updates."
         );
       }
 
@@ -704,13 +707,14 @@ class Rubigraf extends Event {
   }
 
   /**
-   * Stop the long-polling loop.
+   * Stop and destroy the {@link Rubigraf} instance.
    *
    * @since v1.0.0
    */
   stop() {
     this.uninstallAll();
     this.engine.stop();
+    this.logger.info("Rubigraf instance has been destroyed!");
   }
 }
 

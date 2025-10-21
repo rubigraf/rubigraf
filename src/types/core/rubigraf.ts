@@ -1,9 +1,11 @@
 import { ChatKeypadTypeEnum, UpdateEndpointTypeEnum } from "../../enums";
-import { Keypad } from "../rubika";
+import type { Keypad } from "../rubika";
+import type { LoggerOptions } from "./logger";
 
 interface BaseRubigrafOptions {
   baseURL: string;
   freshnessWindow: number;
+  logger?: Omit<LoggerOptions, "prefix">;
 }
 
 type ConditionalRubigrafOptions =

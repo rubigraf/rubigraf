@@ -5,6 +5,7 @@ import type {
   GetUpdatesResponse,
   Update,
 } from "../../types";
+import Logger from "../log/logger";
 import HTTPClient from "./http";
 
 class FetchEngine {
@@ -16,6 +17,7 @@ class FetchEngine {
   constructor(
     private http: HTTPClient,
     private opts: FetchEngineOptions,
+    private logger: Logger,
     private onUpdate: (update: Update) => Promise<void>,
     private onError: (err: unknown) => Promise<void>
   ) {}
@@ -81,7 +83,7 @@ class FetchEngine {
         this.offset_id = updates.next_offset_id || this.offset_id;
 
         if (updates.next_offset_id == null && !this.isOnLatestUpdate) {
-          console.log("Rubigraf is up & running...");
+          this.logger.info("Rubigraf is up & running...");
           this.isOnLatestUpdate = true;
         }
 

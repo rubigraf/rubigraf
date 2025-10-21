@@ -1,6 +1,6 @@
 {
   "name": "rubigraf",
-  "version": "1.2.6",
+  "version": "1.2.8",
   "description": "A Powerful and Modern Rubika Bot Framework",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
