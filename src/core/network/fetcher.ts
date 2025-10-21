@@ -19,7 +19,7 @@ class FetchEngine {
     private opts: FetchEngineOptions,
     private logger: Logger,
     private onUpdate: (update: Update) => Promise<void>,
-    private onError: (err: unknown) => Promise<void>
+    private onError: (err: unknown) => void
   ) {}
 
   /**

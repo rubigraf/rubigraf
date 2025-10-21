@@ -57,7 +57,7 @@ const bot = new Rubigraf(process.env.BOT_TOKEN, { polling: true });
 
 bot.launch();
 
-bot.on(RubigrafEvents.NewMessage, async (ctx, next) => {
+bot.on(RubigrafEvents.NewMessage, async (ctx, payload, next) => {
   await ctx.reply("Hello! 👋 This is a Rubigraf bot.");
 
   return next();
@@ -72,34 +72,52 @@ const bot = new Rubigraf(process.env.BOT_TOKEN, { polling: true });
 
 bot.launch();
 
-// Check if user is registered or not.
-// If it's their first time, the 'onBefore' hook allows the 'on' handler to continue for the 'Command' event on current Update.
-bot.onBefore(RubigrafEvents.Command, async (ctx, next) => {
-  const { command, senderId } = ctx;
+// onBefore: inspect the ctx and attach shared data to payload
+// If user not registered, set payload.registered = false so main handler & after hook see it.
+bot.onBefore(RubigrafEvents.Command, async (ctx, payload, next) => {
+  const userId = ctx.senderId;
 
-  if (command === "start" && !isRegistered(senderId)) {
-    return next();
-  }
-})
+  // lightweight DB check (example)
+  const isRegistered = await db.users.exists(userId);
+  payload.registered = isRegistered; // shared with later hooks
+  payload.userId = userId;
 
-// If registerUser was successful, the 'onAfter' hook for the 'Command' event will continue.
-bot.on(RubigrafEvents.Command, async (ctx, next) => {
-  const { command, senderId } = ctx;
-
-  if (command === "start") {
-    await registerUser(senderId);
-  }
-
+  // allow main handler to continue
   return next();
 });
 
-bot.onAfter(RubigrafEvents.Command, async (ctx) => {
+// main handler: do work and augment payload if needed
+bot.on(RubigrafEvents.Command, async (ctx, payload, next) => {
   const { command } = ctx;
 
   if (command === "start") {
-    await ctx.reply("Welcome to Rubigraf!");
+    if (!payload.registered) {
+      // register user and record result for after-hook
+      await db.users.create(payload.userId);
+      payload.registered = true;
+      payload.justRegistered = true;
+    }
   }
+
+  // continue to after hook
+  return next();
 });
+
+// onAfter: run follow-up tasks using the same payload object
+bot.onAfter(RubigrafEvents.Command, async (ctx, payload) => {
+  // payload.registered / payload.justRegistered are available here
+  if (ctx.command === "start" && payload.justRegistered) {
+    await ctx.reply("Welcome to Rubigraf!");
+  } else if (ctx.command === "start") {
+    await ctx.reply("Welcome back!");
+  }
+
+  // you can also use payload for telemetry/logging
+  globalMetrics.increment("commands_handled", { cmd: ctx.command, registered: !!payload.registered });
+});
+
+// You can also get Rubigraf errors from version 1.2.8 onwards
+bot.on(RubigrafEvents.Error, (err, logger) => logger.error(err));
 ```
 
 ## 🧩 TypeScript Usage

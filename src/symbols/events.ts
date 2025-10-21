@@ -12,6 +12,7 @@ import type {
   PollUpdate,
   QueryUpdate,
   RemovedMessageUpdate,
+  RubigrafPayload,
   StartedBotUpdate,
   StickerUpdate,
   StoppedBotUpdate,
@@ -39,31 +40,31 @@ namespace RubigrafEvents {
   export const Update = Symbol("update");
 
   export type Map = {
-    [Command]: [ctx: Context<CommandUpdate>, next: Next];
-    [Contact]: [ctx: Context<ContactUpdate>, next: Next];
-    [Error]: [err: Error | string | unknown, logger: Logger, next: Next];
-    [File]: [ctx: Context<FileUpdate>, next: Next];
-    [ForwardedFrom]: [ctx: Context<ForwardedFromUpdate>, next: Next];
-    [LiveLocation]: [ctx: Context<LiveLocationUpdate>, next: Next];
-    [Location]: [ctx: Context<LocationUpdate>, next: Next];
-    [NewMessage]: [ctx: Context<NewMessageUpdate>, next: Next];
-    [Poll]: [ctx: Context<PollUpdate>, next: Next];
-    [Query]: [ctx: Context<QueryUpdate>, next: Next];
-    [RemovedMessage]: [ctx: Context<RemovedMessageUpdate>, next: Next];
-    [StartedBot]: [ctx: Context<StartedBotUpdate>, next: Next];
-    [Sticker]: [ctx: Context<StickerUpdate>, next: Next];
-    [StoppedBot]: [ctx: Context<StoppedBotUpdate>, next: Next];
-    [UpdatedPayment]: [ctx: Context<UpdatedPaymentUpdate>, next: Next];
-    [UpdatedMessage]: [ctx: Context<UpdatedMessageUpdate>, next: Next];
-    [Update]: [ctx: Context, next: Next];
+    [Command]: [ctx: Context<CommandUpdate>, payload: RubigrafPayload, next: Next];
+    [Contact]: [ctx: Context<ContactUpdate>, payload: RubigrafPayload, next: Next];
+    [Error]: [err: Error | string | unknown, logger: Logger];
+    [File]: [ctx: Context<FileUpdate>, payload: RubigrafPayload, next: Next];
+    [ForwardedFrom]: [ctx: Context<ForwardedFromUpdate>, payload: RubigrafPayload, next: Next];
+    [LiveLocation]: [ctx: Context<LiveLocationUpdate>, payload: RubigrafPayload, next: Next];
+    [Location]: [ctx: Context<LocationUpdate>, payload: RubigrafPayload, next: Next];
+    [NewMessage]: [ctx: Context<NewMessageUpdate>, payload: RubigrafPayload, next: Next];
+    [Poll]: [ctx: Context<PollUpdate>, payload: RubigrafPayload, next: Next];
+    [Query]: [ctx: Context<QueryUpdate>, payload: RubigrafPayload, next: Next];
+    [RemovedMessage]: [ctx: Context<RemovedMessageUpdate>, payload: RubigrafPayload, next: Next];
+    [StartedBot]: [ctx: Context<StartedBotUpdate>, payload: RubigrafPayload, next: Next];
+    [Sticker]: [ctx: Context<StickerUpdate>, payload: RubigrafPayload, next: Next];
+    [StoppedBot]: [ctx: Context<StoppedBotUpdate>, payload: RubigrafPayload, next: Next];
+    [UpdatedPayment]: [ctx: Context<UpdatedPaymentUpdate>, payload: RubigrafPayload, next: Next];
+    [UpdatedMessage]: [ctx: Context<UpdatedMessageUpdate>, payload: RubigrafPayload, next: Next];
+    [Update]: [ctx: Context, payload: RubigrafPayload, next: Next];
   };
+
+  export type NonErrorEvents = Exclude<keyof Map, typeof Error>;
 
   /**
    * A lazy-loadable event listener wrapper.
    */
   export type BotEventInstaller<C, K extends keyof Map> = (events: C) => (...args: Map[K]) => void;
 }
-
-let s: RubigrafEvents.Map[typeof RubigrafEvents.NewMessage];
 
 export { RubigrafEvents };
